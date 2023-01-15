@@ -1,18 +1,13 @@
 package com.chatbot.websocket;
 
+import com.chatbot.websocket.responseMapper.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.util.HtmlUtils;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -22,14 +17,15 @@ import java.util.HashMap;
 public class ServerResponseController {
 
     @MessageMapping("/inquiry")
-    @SendTo("/topics/weather")
+    @SendTo("/topic/weather")
     public ServerResponse serverResponse(ClientPrompt prompt) throws Exception{
         Thread.sleep(1000); // simulated delay
-        executePost(HtmlUtils.htmlEscape(prompt.getPrompt()));
-        return new ServerResponse("Hello, " + HtmlUtils.htmlEscape(prompt.getPrompt() + "!"));
+        System.out.println(HtmlUtils.htmlEscape(prompt.getText()));
+        executePost(HtmlUtils.htmlEscape(prompt.getText()));
+        return new ServerResponse("Hello, " + HtmlUtils.htmlEscape(prompt.getText() + "!"));
     }
 
-    public static void executePost(String urlParameters) throws Exception{
+    public void executePost(String urlParameters) throws Exception{
         var values = new HashMap<String, String>() {{
             put("text", urlParameters);
         }};
@@ -40,13 +36,21 @@ public class ServerResponseController {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:80/model/parse"))
-                .POST(HttpRequest.BodyPublishers.ofString(urlParameters))
+                .uri(URI.create("http://localhost:5005/model/parse"))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
         HttpResponse<String> response = client.send(request,
                 HttpResponse.BodyHandlers.ofString());
 
-        System.out.println(response.body());
+        Response mappedResponse = mapResponse(response.body());
+
+        System.out.println(mappedResponse.getIntent().getName());
+    }
+
+    public Response mapResponse(String responseJson) throws Exception{
+        ObjectMapper mapper = new ObjectMapper();
+        Response response = mapper.readValue(responseJson, Response.class);
+        return response;
     }
 }

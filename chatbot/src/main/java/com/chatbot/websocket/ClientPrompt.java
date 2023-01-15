@@ -2,19 +2,17 @@ package com.chatbot.websocket;
 
 public class ClientPrompt {
 
-    private String prompt;
+    private String text;
 
-    public ClientPrompt(){}
-
-    public ClientPrompt(String prompt){
-        this.prompt = prompt;
+    public ClientPrompt(String text){
+        this.text = text;
     }
 
-    public String getPrompt() {
-        return prompt;
+    public String getText() {
+        return text;
     }
 
-    public void setPrompt(String prompt) {
-        this.prompt = prompt;
+    public void setText(String text) {
+        this.text = text;
     }
 }

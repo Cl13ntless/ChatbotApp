@@ -18,8 +18,8 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/weather', function (serverResponse) {
-            showResponse(JSON.parse(serverResponse.body).content);
+        stompClient.subscribe('/topic/weather', function (greeting) {
+            showGreeting(JSON.parse(greeting.body).content);
         });
     });
 }
