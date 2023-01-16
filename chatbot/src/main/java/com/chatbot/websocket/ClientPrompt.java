@@ -4,6 +4,8 @@ public class ClientPrompt {
 
     private String text;
 
+    public ClientPrompt(){}
+
     public ClientPrompt(String text){
         this.text = text;
     }

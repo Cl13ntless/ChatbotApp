@@ -43,6 +43,8 @@ public class ServerResponseController {
         HttpResponse<String> response = client.send(request,
                 HttpResponse.BodyHandlers.ofString());
 
+        System.out.println(response.body());
+
         Response mappedResponse = mapResponse(response.body());
 
         System.out.println(mappedResponse.getIntent().getName());

@@ -7,6 +7,7 @@ public class Response {
     String text;
     Intent intent;
 
+    public Response(){}
 
     public String getText() {
         return text;
