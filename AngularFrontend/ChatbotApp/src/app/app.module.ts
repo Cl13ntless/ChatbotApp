@@ -2,15 +2,26 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
+import { rxStompServiceFactory } from './rx-stomp-service-factory';
+import { RxStompService } from './rx-stomp.service';
+import { MessagesComponent } from './messages/messages.component';
+import { RxStomp } from '@stomp/rx-stomp';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    MessagesComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    FormsModule
   ],
-  providers: [],
+  providers: [{
+    provide: RxStompService,
+    useFactory: rxStompServiceFactory,
+  }
+],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
