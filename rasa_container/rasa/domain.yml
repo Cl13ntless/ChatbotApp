@@ -3,35 +3,44 @@ version: "3.1"
 intents:
   - greet
   - goodbye
-  - affirm
-  - deny
-  - mood_great
-  - mood_unhappy
   - bot_challenge
-  - bratwurst
+  - weather
+  - city_weather
+
+entities:
+  - heute
+  - morgen
+  - kommende Woche
+
+slots:
+  heute:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: heute
+  morgen:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: morgen
+  kommende Woche:
+    type: text
+    mappings:
+    - type: from_entity
+      entity:  kommende Woche
+  
+
 
 responses:
   utter_greet:
-  - text: "Hey! How are you?"
-
-  utter_cheer_up:
-  - text: "Here is something to cheer you up:"
-    image: "https://i.imgur.com/nGF1K8f.jpg"
-
-  utter_did_that_help:
-  - text: "Did that help you?"
-
-  utter_happy:
-  - text: "Great, carry on!"
+  - text: "Hey! Wie gehts dir?"
 
   utter_goodbye:
-  - text: "Bye"
+  - text: "Tschüss!"
 
   utter_iamabot:
-  - text: "I am a bot, powered by Rasa."
+  - text: "Ich bin ein Wetter Chatbot, der die aktuelle und zukünftige Temperatur in verschiedenen Städten anzeigen kann."
   
-  utter_bratwurst:
-  - text: "Gib mir eine Bratwurst"
 
 session_config:
   session_expiration_time: 60

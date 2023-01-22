@@ -11,8 +11,3 @@ rules:
   steps:
   - intent: bot_challenge
   - action: utter_iamabot
-
-- rule: Say 'Bratwurst' anytime the user wants bratwurst
-  steps:
-  - intent: bratwurst
-  - action: utter_bratwurst

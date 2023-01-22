@@ -3,96 +3,88 @@ version: "3.1"
 nlu:
 - intent: greet
   examples: |
-    - hey
-    - hello
-    - hi
-    - hello there
-    - good morning
-    - good evening
+    - hallo
+    - servus
     - moin
-    - hey there
-    - let's go
-    - hey dude
-    - goodmorning
-    - goodevening
-    - good afternoon
+    - hallöchen
+    - guten tag
+    - hey
+    - guten morgen
 
 - intent: goodbye
   examples: |
-    - cu
-    - good by
-    - cee you later
-    - good night
+    - tschüss
+    - tschau
+    - bis später
+    - gute nacht
     - bye
     - goodbye
-    - have a nice day
-    - see you around
+    - einen schönen tag dir noch
+    - man sieht sich
     - bye bye
     - see you later
 
-- intent: affirm
-  examples: |
-    - yes
-    - y
-    - indeed
-    - of course
-    - that sounds good
-    - correct
-
-- intent: deny
-  examples: |
-    - no
-    - n
-    - never
-    - I don't think so
-    - don't like that
-    - no way
-    - not really
-
-- intent: mood_great
-  examples: |
-    - perfect
-    - great
-    - amazing
-    - feeling like a king
-    - wonderful
-    - I am feeling very good
-    - I am great
-    - I am amazing
-    - I am going to save the world
-    - super stoked
-    - extremely good
-    - so so perfect
-    - so good
-    - so perfect
-
-- intent: mood_unhappy
-  examples: |
-    - my day was horrible
-    - I am sad
-    - I don't feel very well
-    - I am disappointed
-    - super sad
-    - I'm so sad
-    - sad
-    - very sad
-    - unhappy
-    - not good
-    - not very good
-    - extremly sad
-    - so saad
-    - so sad
-
 - intent: bot_challenge
   examples: |
-    - are you a bot?
-    - are you a human?
-    - am I talking to a bot?
-    - am I talking to a human? 
+    - Bist du ein chatbot?
+    - Bist du ein Mensch
+    - Spreche ich mit einem Bot?
+    - spreche ichmit einem Menschen?
+    - Wer bist du?
+    - Was kannst du? 
+    - Was tust du? 
     
-- intent: bratwurst
+- intent: weather
   examples: |
-    - bratwurst
-    - Hast du Bratwurst
+    - Wie warm wird es [heute](heute)?
+    - Wie warm ist es [jetzt](heute)
+    - Wie viel grad wird es [morgen](morgen) haben?
+    - Wie warm wird es [morgen](morgen)
+    - Temperatur der [nächsten Woche](kommende Woche)
+    - Wie warm wird es [kommende Woche](kommende Woche)
+    - [Aktuelle](heute) Temperatur
+    - Wie heiß ist es [gerade](heute)
+    - Sage mir die Temperatur für [kommende Woche](kommende Woche)
+    - Zeige mir die Temperatur für [morgen](morgen)
+    - Wie heiß wird es [morgen](morgen)?
+    - Wie kalt wird es [morgen](morgen)?
+    - Wie kalt wird es [heute](heute)?
+    - Wie kalt wird es nächste [Woche](kommende Woche)?
+    - Wie [ist](today) das Wetter?
     
 
+- intent: city_weather
+  examples: |
+    - Wie warm ist es [gerade](heute) in Tokio?
+    - [Aktuelle](heute) Temperatur in London?
+    - Wie [ist](heute) die Temperatur heute in Amsterdam? 
+    - Wie warm wird es [heute](heute) in München?
+    - Wie warm ist es [jetzt](heute) in Berlin?
+    - Wie viel grad wird es [morgen](morgen) in New York haben?
+    - Wie warm wird es [morgen](morgen) in Sydney?
+    - Temperatur der [nächsten Woche](kommende Woche) in Madrid?
+    - Wie warm wird es [kommende Woche](kommende Woche) in Rotterdamm?
+    - Wie heiß ist es [gerade](heute) in Pensyllvania?
+    - Sage mir die Temperatur für [kommende Woche](kommende Woche) in Wien
+    - Zeige mir die Temperatur für [morgen](morgen) in Köln
+    - Wie heiß wird es [morgen](morgen) in Bielefeld?`
+    - Wie kalt wird es [morgen](morgen) in Rom?
+    - Wie kalt wird es [heute](heute) in Dubai?
+    - Wie kalt wird es nächste [Woche](kommende Woche) in Budapest?
+    - [Aktuelle](heute) Temperatur Würzburg
+    - Wie [ist](today) das Wetter in Budapest?
+
+- lookup: heute
+  examples: |
+    - heute
+    - gerade
+    - jetzt
+    
+- lookup: morgen
+  examples: |
+    - morgen
+
+- lookup: kommende Woche
+  examples: |
+    - kommende Woche
+    - nächste Woche
