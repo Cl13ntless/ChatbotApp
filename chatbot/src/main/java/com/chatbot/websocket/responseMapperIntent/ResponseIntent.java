@@ -8,11 +8,12 @@ public class ResponseIntent {
     Intent intent;
     Entity[] entities;
 
+    public ResponseIntent() {
+    }
+
     public Entity[] getEntities() {
         return entities;
     }
-
-    public ResponseIntent(){}
 
     public String getText() {
         return text;
@@ -21,7 +22,6 @@ public class ResponseIntent {
     public Intent getIntent() {
         return intent;
     }
-
 
 
 }

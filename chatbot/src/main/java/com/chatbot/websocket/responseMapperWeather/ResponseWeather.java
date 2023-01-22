@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ResponseWeather {
-    Weather[] weather ;
+    Weather[] weather;
 
-    public ResponseWeather(){}
+    public ResponseWeather() {
+    }
 
     public Weather[] getWeather() {
         return weather;

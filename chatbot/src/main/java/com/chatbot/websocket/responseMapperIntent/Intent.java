@@ -4,7 +4,9 @@ public class Intent {
     String name;
     int confidence;
 
-    public Intent(){}
+    public Intent() {
+    }
+
     public String getName() {
         return name;
     }

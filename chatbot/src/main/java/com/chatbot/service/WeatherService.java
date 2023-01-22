@@ -14,10 +14,11 @@ public class WeatherService {
     ObjectMapper mapper = new ObjectMapper();
     String lat = "48.13923210048965";
     String lon = "11.581793217175251";
-    public Weather weatherApiCall(String date) throws  Exception{
+
+    public Weather weatherApiCall(String date) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI("https://api.brightsky.dev/weather?lat="+ lat +"&lon="+ lon +"&date="+ date +"&last_date="+ date))
+                .uri(new URI("https://api.brightsky.dev/weather?lat=" + lat + "&lon=" + lon + "&date=" + date + "&last_date=" + date))
                 .GET()
                 .build();
 
@@ -29,11 +30,11 @@ public class WeatherService {
         return weathers[0];
     }
 
-    public Weather cityWeatherApiCall(String date, String longitude, String latitude) throws  Exception{
+    public Weather cityWeatherApiCall(String date, String longitude, String latitude) throws Exception {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI("https://api.brightsky.dev/weather?lat="+ latitude +"&lon="+ longitude +"&date="+ date +"&last_date="+ date))
+                .uri(new URI("https://api.brightsky.dev/weather?lat=" + latitude + "&lon=" + longitude + "&date=" + date + "&last_date=" + date))
                 .GET()
                 .build();
 
@@ -45,11 +46,11 @@ public class WeatherService {
         return weathers[0];
     }
 
-    public Geolocation getGeolocation(String location) throws Exception{
+    public Geolocation getGeolocation(String location) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI("https://api.api-ninjas.com/v1/geocoding?city=" + location))
-                .setHeader("X-Api-Key","FDWhrAttUr5pWXScGAim0A==9pba7IQ8WtriLrRi")
+                .setHeader("X-Api-Key", "FDWhrAttUr5pWXScGAim0A==9pba7IQ8WtriLrRi")
                 .GET()
                 .build();
 

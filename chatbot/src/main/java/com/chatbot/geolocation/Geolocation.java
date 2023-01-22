@@ -8,6 +8,9 @@ public class Geolocation {
     double latitude;
     double longitude;
 
+    public Geolocation() {
+    }
+
     public double getLatitude() {
         return latitude;
     }
@@ -19,8 +22,6 @@ public class Geolocation {
     public String getName() {
         return name;
     }
-
-    public Geolocation(){}
 
 
 }

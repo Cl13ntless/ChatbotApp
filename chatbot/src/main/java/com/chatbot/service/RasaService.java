@@ -21,7 +21,8 @@ public class RasaService {
     LocalDate today = LocalDate.now();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     ObjectMapper objectMapper = new ObjectMapper();
-    public ResponseIntent getInitialParameters(String urlParameters) throws Exception{
+
+    public ResponseIntent getInitialParameters(String urlParameters) throws Exception {
         var values = new HashMap<String, String>() {{
             put("text", urlParameters);
         }};
@@ -41,7 +42,7 @@ public class RasaService {
 
     }
 
-    public String getChatResponse(String clientMessage) throws Exception{
+    public String getChatResponse(String clientMessage) throws Exception {
         var values = new HashMap<String, String>() {{
             put("sender", "test_user");
             put("message", clientMessage);
@@ -58,7 +59,7 @@ public class RasaService {
         return chatResponseArray[0].getText();
     }
 
-    public HttpResponse<String> postRequestRasa(String url, String jsonValues) throws Exception{
+    public HttpResponse<String> postRequestRasa(String url, String jsonValues) throws Exception {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -72,16 +73,16 @@ public class RasaService {
         return response;
     }
 
-    public ResponseIntent mapResponse(String responseJson) throws Exception{
+    public ResponseIntent mapResponse(String responseJson) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         ResponseIntent mappedResponse = mapper.readValue(responseJson, ResponseIntent.class);
         return mappedResponse;
     }
 
-    public Weather getRequestedWeather(Entity entity) throws Exception{
+    public Weather getRequestedWeather(Entity entity) throws Exception {
         System.out.println(today);
         System.out.println(today.plusDays(7));
-        switch(entity.getEntity()){
+        switch (entity.getEntity()) {
             case "heute":
                 return weatherService.weatherApiCall(today.format(formatter));
 
@@ -90,25 +91,25 @@ public class RasaService {
 
             case "kommende Woche":
                 return weatherService.weatherApiCall(today.plusDays(7).format(formatter));
-                
+
             default:
                 return null;
         }
     }
 
-    public Weather getRequestedCityWeather(Entity entity, String lat, String lon) throws Exception{
+    public Weather getRequestedCityWeather(Entity entity, String lat, String lon) throws Exception {
         System.out.println(today);
         System.out.println(today.plusDays(7));
 
-        switch(entity.getEntity()){
+        switch (entity.getEntity()) {
             case "heute":
-                return weatherService.cityWeatherApiCall(today.format(formatter) , lon , lat);
+                return weatherService.cityWeatherApiCall(today.format(formatter), lon, lat);
 
             case "morgen":
-                return weatherService.cityWeatherApiCall(today.plusDays(1).format(formatter), lon , lat);
+                return weatherService.cityWeatherApiCall(today.plusDays(1).format(formatter), lon, lat);
 
             case "kommende Woche":
-                return weatherService.cityWeatherApiCall(today.plusDays(7).format(formatter) , lon , lat);
+                return weatherService.cityWeatherApiCall(today.plusDays(7).format(formatter), lon, lat);
 
             default:
                 return null;
