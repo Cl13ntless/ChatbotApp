@@ -34,6 +34,7 @@ public class RasaService {
 
         ResponseIntent mappedResponse = mapResponse(initialResponse.body());
 
+
         System.out.println(mappedResponse.getIntent().getName());
         System.out.println(weatherService.weatherApiCall("2023-01-20T15:00"));
         return mappedResponse;
