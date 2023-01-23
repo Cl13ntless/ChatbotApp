@@ -1,4 +1,10 @@
-<nb-chat title="Weather Chatbot">
+<nb-chat title="Weather Chatbot" >
+    <ng-template nbChatTitle>
+        <div class = "title">Weather Chatbot
+            <p name="location" ngDefaultControl [(ngModel)]="currentLocation" #ctrl="ngModel" required>{{currentLocation}}</p>
+        </div>
+         <button nbButton outline status="info" (click)="getLocation()">Submit your location!<nb-icon icon="navigation-2-outline"></nb-icon></button>
+      </ng-template>
     <nb-chat-message *ngFor="let msg of messages"
                      type="text"
                      [message]="msg.text"

@@ -6,6 +6,7 @@ pipeline:
   - name: SpacyTokenizer
   - name: SpacyFeaturizer
   - name: SpacyEntityExtractor
+    model: de_core_news_lg
   - name: LexicalSyntacticFeaturizer
   - name: CountVectorsFeaturizer
     analyzer: char_wb

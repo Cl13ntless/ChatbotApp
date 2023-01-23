@@ -1,6 +1,7 @@
 package com.chatbot.service;
 
 import com.chatbot.geolocation.Geolocation;
+import com.chatbot.geolocation.ReverseGeolocation;
 import com.chatbot.websocket.responseMapperWeather.ResponseWeather;
 import com.chatbot.websocket.responseMapperWeather.Weather;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,8 +13,43 @@ import java.net.http.HttpResponse;
 
 public class WeatherService {
     ObjectMapper mapper = new ObjectMapper();
-    String lat = "48.13923210048965";
-    String lon = "11.581793217175251";
+    String lat = "50.93685333230222";
+    String lon = "6.9625096284618975";
+    String city = "Bielefeld";
+    String country = "Deutschland";
+    String housenumber = "69";
+    String street = "Herforder Straße";
+
+    public void setLat(String lat) {
+        this.lat = lat;
+    }
+    public void setLon(String lon) {
+        this.lon = lon;
+    }
+
+    public String getLat() {
+        return lat;
+    }
+
+    public String getLon() {
+        return lon;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public String getHousenumber() {
+        return housenumber;
+    }
+
+    public String getStreet() {
+        return street;
+    }
 
     public Weather weatherApiCall(String date) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
@@ -47,6 +83,9 @@ public class WeatherService {
     }
 
     public Geolocation getGeolocation(String location) throws Exception {
+        System.out.println("DEBUG:" + location);
+        location = location.replaceAll("&uuml;","ue").replaceAll("&Auml;","ae").replaceAll("&ouml;","oe");
+        System.out.println("DEBUG:" + location);
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI("https://api.api-ninjas.com/v1/geocoding?city=" + location))
@@ -65,5 +104,27 @@ public class WeatherService {
         System.out.println(geolocations[0].getLatitude());
         System.out.println(geolocations[0].getLongitude());
         return geolocations[0];
+    }
+
+    public String getReverseGeolocation(String lat, String lon) throws Exception{
+        System.out.println(lat);
+        System.out.println(lon);
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI("https://api.geoapify.com/v1/geocode/reverse?lat=" + lat +"&lon=" + lon + "&lang=de&apiKey=5a48358bff2b4ff3a8d33b8b8a623dfc"))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client
+                .send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println(response.body());
+
+        ReverseGeolocation reverseGeolocations = mapper.readValue(response.body(), ReverseGeolocation.class);
+        city = reverseGeolocations.getFeatures()[0].getProperties().getCity();
+        street = reverseGeolocations.getFeatures()[0].getProperties().getStreet();
+        housenumber = reverseGeolocations.getFeatures()[0].getProperties().getHousenumber();
+        country = reverseGeolocations.getFeatures()[0].getProperties().getCountry();
+        return city;
     }
 }

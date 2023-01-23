@@ -49,8 +49,17 @@ nlu:
     - Wie heiß wird es [morgen](morgen)?
     - Wie kalt wird es [morgen](morgen)?
     - Wie kalt wird es [heute](heute)?
-    - Wie kalt wird es nächste [Woche](kommende Woche)?
-    - Wie [ist](today) das Wetter?
+    - Wie kalt wird es [nächste Woche](kommende Woche)?
+    - Wie [ist](heute) das Wetter?
+    - Wie warm [ist](heute) es [heute](heute)?
+    - Wie warm [ist](heute) es?
+    - Wie [ist](heute) das Wetter?
+    - Wie [ist](heute) das Wetter [heute](heute)?
+    - Wie warm wird es [nächste Woche](kommende Woche)?
+    - Wetter [nächste Woche](kommende Woche)
+    - Temperatur [nächste Woche](kommende Woche)
+    - [nächste Woche](kommende Woche)
+    - Temperatur für nächste Woche
     
 
 - intent: city_weather
@@ -70,9 +79,19 @@ nlu:
     - Wie heiß wird es [morgen](morgen) in Bielefeld?`
     - Wie kalt wird es [morgen](morgen) in Rom?
     - Wie kalt wird es [heute](heute) in Dubai?
-    - Wie kalt wird es nächste [Woche](kommende Woche) in Budapest?
+    - Wie kalt wird es [nächste Woche](kommende Woche) in Budapest?
     - [Aktuelle](heute) Temperatur Würzburg
-    - Wie [ist](today) das Wetter in Budapest?
+    - Wie [ist](heute) das Wetter in Budapest?
+    - Wie [ist](heute) das Wetter in Prag?
+    - Wie warm [ist](heute) es [heute](heute) in Stuttgart?
+    - Wie warm [ist](heute) es in Tokyo?
+    - Wie [ist](heute) das Wetter in Singapur?
+    - Wie [ist](heute) das Wetter [heute](heute) in Madrid?
+    - Wie warm wird es [nächste Woche](kommende Woche) in Athen?
+    - Wetter [nächste Woche](kommende Woche) in Geretsried
+    - Temperatur [nächste Woche](kommende Woche) in Wolfratshausen
+    - [nächste Woche](kommende Woche) in Kassel
+    - Mainz Temperatur für nächste Woche
 
 - lookup: heute
   examples: |

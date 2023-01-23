@@ -32,10 +32,13 @@ public class ServerResponseController {
             if (mappedResponse.getEntities().length != 1) {
                 return createErrorResponse();
             }
-            //Wetter für standarmäßigen Standort wird von Wetter API abgefragt
+            //Wetter für standarmäßigen Standort / Standort wird von Wetter API abgefragt
 
             Entity requestedDay = mappedResponse.getEntities()[0];
-            return new ServerResponse("Die aktuell vorausgesagte Temperatur für München " + requestedDay.getEntity() + " sind " + rasaService.getRequestedWeather(requestedDay).getTemperature() + " Grad Celsius.");
+            String lat = weatherservice.getLat();
+            String lon = weatherservice.getLon();
+            return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + weatherservice.getReverseGeolocation(lat,lon)+ " "
+                    + requestedDay.getEntity() + " sind " + rasaService.getRequestedCityWeather(requestedDay, lat, lon).getTemperature() + " Grad Celsius.");
 
         } else if (Objects.equals(mappedResponse.getIntent().getName(), "city_weather")) {
             if (mappedResponse.getEntities().length != 2) {
@@ -43,13 +46,14 @@ public class ServerResponseController {
             }
             //Wenn eine Stadt übergeben wird müssen lat und lon geholt und der WetterAPI Call abhängig von ihnen gemacht werden
 
-            Geolocation geolocation = weatherservice.getGeolocation(mappedResponse.getEntities()[0].getValue());
+            Geolocation geolocation = weatherservice.getGeolocation(mappedResponse.getEntities()[0].getValue().replaceAll(" ","/"));
             String lat = String.valueOf(geolocation.getLatitude());
             String lon = String.valueOf(geolocation.getLongitude());
             Entity day = mappedResponse.getEntities()[1];
-            String city = geolocation.getName();
+            String city = mappedResponse.getEntities()[0].getValue().replaceAll("\\?","");
 
-            return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + day.getEntity() + " in " + city + " sind " + rasaService.getRequestedCityWeather(day, lat, lon).getTemperature() + " Grad Celcius");
+            return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + day.getEntity() + " in " + city + " sind "
+                    + rasaService.getRequestedCityWeather(day, lat, lon).getTemperature() + " Grad Celcius");
         }
 
         if (mappedResponse.getEntities().length != 0) {
@@ -58,6 +62,22 @@ public class ServerResponseController {
         //Request zurück an Rasa für die standard Chatbot Antwort
 
         return new ServerResponse(rasaService.getChatResponse(HtmlUtils.htmlEscape(prompt.getText())));
+    }
+
+    @MessageMapping("/lat")
+    public void getLat(String lat){
+        System.out.println(lat);
+        weatherservice.setLat(lat);
+    }
+
+    @MessageMapping("/lon")
+    @SendTo("/topic/currentLoc")
+    public ServerResponse getLon(String lon) throws Exception{
+        System.out.println(lon);
+        weatherservice.setLon(lon);
+        weatherservice.getReverseGeolocation(weatherservice.getLat(), lon);
+        return new ServerResponse("Aktuelle Position: " + weatherservice.getCity() + " " + weatherservice.getStreet()
+                + " " + weatherservice.getHousenumber()+ " , " + weatherservice.getCountry());
     }
 
     public ServerResponse createErrorResponse() {

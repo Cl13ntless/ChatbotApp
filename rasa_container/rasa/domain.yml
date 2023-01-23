@@ -33,7 +33,7 @@ slots:
 
 responses:
   utter_greet:
-  - text: "Hey! Wie gehts dir?"
+  - text: "Hey!"
 
   utter_goodbye:
   - text: "Tschüss!"

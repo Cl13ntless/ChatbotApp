@@ -1,8 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { NbThemeService } from '@nebular/theme';
 import { WebSocketAPI } from '../WebSocketAPI';
-
-
-const dialogflowURL = 'https://YOUR-CLOUDFUNCTION/dialogflowGateway';
 
 @Component({
   selector: 'app-chatbot',
@@ -14,6 +12,9 @@ export class ChatbotComponent implements OnInit, OnDestroy{
   webSocketAPI: WebSocketAPI;
   messages: any = [];
   loading = false;
+  currentLat: any;
+  currentLon: any;
+  currentLocation: string = "Aktuelle Position: Bielefeld Herforderstraße 69 , Deutschland";
 
   constructor() {}
 
@@ -21,7 +22,6 @@ export class ChatbotComponent implements OnInit, OnDestroy{
     this.addBotMessage('Human presence detected 🤖. Wie kann ich dir behilflich sein? ');
     this.webSocketAPI = new WebSocketAPI(this);
     this.webSocketAPI._connect();
-  
   }
 
   handleUserMessage(event: any) {
@@ -35,7 +35,7 @@ export class ChatbotComponent implements OnInit, OnDestroy{
   addUserMessage(text: string) {
     this.messages.push({
       text,
-      sender: 'You',
+      sender: 'Julius Figge',
       avatar: '/assets/bot.jpeg',
       reply: true,
       date: new Date()
@@ -59,6 +59,24 @@ export class ChatbotComponent implements OnInit, OnDestroy{
 
   ngOnDestroy(): void {
     this.webSocketAPI._disconnect();
+  }
+
+  getLocation(): void{
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position)=>{
+          this.currentLon = position.coords.longitude;
+          this.currentLat = position.coords.latitude;
+          console.log(this.currentLat.toString());
+          console.log(this.currentLon.toString());
+          this.webSocketAPI._sendLocation(this.currentLon,this.currentLat);
+        });
+    } else {
+       console.log("No support for geolocation")
+    }
+  }
+
+  updateCurrentLocation(location: string): void{
+    this.currentLocation = location;
   }
 
 }

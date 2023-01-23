@@ -20,6 +20,9 @@ export class WebSocketAPI {
             _this.stompClient.subscribe(_this.topic, function (sdkEvent: any) {
                 _this.onMessageReceived(sdkEvent);
             });
+            _this.stompClient.subscribe("/topic/currentLoc", function (sdkEvent: any) {
+                _this.onLocationReceived(sdkEvent);
+            });
             //_this.stompClient.reconnect_delay = 2000;
         }, this.errorCallBack);
     };
@@ -44,12 +47,26 @@ export class WebSocketAPI {
   * @param {*} message 
   */
     _send(message: any) {
+        console.log(message);
         console.log("calling logout api via web socket");
         this.stompClient.send("/app/inquiry", {}, JSON.stringify(message));
+    }
+
+    _sendLocation(lon: number, lat: number) {
+        console.log("calling logout api via web socket");
+        this.stompClient.send("/app/lat", {}, JSON.stringify(lat));
+        this.stompClient.send("/app/lon", {}, JSON.stringify(lon));
+
     }
 
     onMessageReceived(message: any) {
         console.log("Message Recieved from Server :: " + message);
         this.chatComponent.handleMessage(JSON.parse(message.body).content);
     }
+
+    onLocationReceived(location: any) {
+        console.log("Location Recieved from Server :: " + JSON.parse(location.body).content);
+        this.chatComponent.updateCurrentLocation(JSON.parse(location.body).content);
+    }
+
 }
