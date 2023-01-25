@@ -49,6 +49,7 @@ export class ChatbotComponent implements OnInit, OnDestroy{
       avatar: '/assets/bot.jpeg',
       date: new Date()
     });
+    window.scroll(0,document.body.scrollHeight);
   }
 
   handleMessage(message:any){

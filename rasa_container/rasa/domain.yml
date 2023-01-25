@@ -6,24 +6,33 @@ intents:
   - bot_challenge
   - weather
   - city_weather
+  - other_day
+  - other_city
 
 entities:
   - heute
   - morgen
   - kommende Woche
+  - LOC
+  - MISC
 
 slots:
-  heute:
+  location:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: LOC
+  today:
     type: text
     mappings:
     - type: from_entity
       entity: heute
-  morgen:
+  tomorrow:
     type: text
     mappings:
     - type: from_entity
       entity: morgen
-  kommende Woche:
+  next_week:
     type: text
     mappings:
     - type: from_entity
@@ -40,7 +49,18 @@ responses:
 
   utter_iamabot:
   - text: "Ich bin ein Wetter Chatbot, der die aktuelle und zukünftige Temperatur in verschiedenen Städten anzeigen kann."
-  
+
+  utter_weather:
+  - text: "Weather!"
+
+  utter_city_weather:
+  - text: "City Weather"
+
+  utter_other_day:
+  - text: "Other Day!"
+
+  utter_other_city:
+  - text: "Other City"
 
 session_config:
   session_expiration_time: 60

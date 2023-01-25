@@ -3,6 +3,8 @@ package com.chatbot.service;
 import com.chatbot.websocket.responseMapperChatbot.ResponseChatbot;
 import com.chatbot.websocket.responseMapperIntent.Entity;
 import com.chatbot.websocket.responseMapperIntent.ResponseIntent;
+import com.chatbot.websocket.responseMapperSlots.ResponseSlots;
+import com.chatbot.websocket.responseMapperSlots.Slot;
 import com.chatbot.websocket.responseMapperWeather.Weather;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,6 +20,7 @@ public class RasaService {
     WeatherService weatherService = new WeatherService();
     String RASA_URL = "http://localhost:5005/model/parse";
     String RASA_CONVERSATIONS_URL = "http://localhost:5005/webhooks/rest/webhook";
+    String RASA_SLOT_URL = "http://localhost:5005/conversations/test_user/tracker";
     LocalDate today = LocalDate.now();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     ObjectMapper objectMapper = new ObjectMapper();
@@ -27,17 +30,24 @@ public class RasaService {
             put("text", urlParameters);
         }};
 
+        //send text to rasa to set slots
+        var values2 = new HashMap<String, String>() {{
+            put("sender", "test_user");
+            put("message", urlParameters);
+        }};
+        String chatRequest = objectMapper.writeValueAsString(values2);
+        HttpResponse<String> chatResponse = postRequestRasa(RASA_CONVERSATIONS_URL, chatRequest);
+
+
+
         String requestBody = objectMapper.writeValueAsString(values);
 
         HttpResponse<String> initialResponse = postRequestRasa(RASA_URL, requestBody);
 
-        System.out.println(initialResponse.body());
-
         ResponseIntent mappedResponse = mapResponse(initialResponse.body());
 
+        System.out.println(initialResponse.body());
 
-        System.out.println(mappedResponse.getIntent().getName());
-        System.out.println(weatherService.weatherApiCall("2023-01-20T15:00"));
         return mappedResponse;
 
     }
@@ -51,8 +61,6 @@ public class RasaService {
         String requestBody = objectMapper.writeValueAsString(values);
 
         HttpResponse<String> chatResponse = postRequestRasa(RASA_CONVERSATIONS_URL, requestBody);
-
-        System.out.println(chatResponse.body());
 
         ResponseChatbot[] chatResponseArray = objectMapper.readValue(chatResponse.body(), ResponseChatbot[].class);
 
@@ -80,8 +88,6 @@ public class RasaService {
     }
 
     public Weather getRequestedCityWeather(Entity entity, String lat, String lon) throws Exception {
-        System.out.println(today);
-        System.out.println(today.plusDays(7));
 
         switch (entity.getEntity()) {
             case "heute":
@@ -96,5 +102,25 @@ public class RasaService {
             default:
                 return null;
         }
+    }
+
+    public Slot getSetSlots() throws Exception{
+        ObjectMapper objectMapper = new ObjectMapper();
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI(RASA_SLOT_URL))
+                .GET()
+                .build();
+        System.out.println(request);
+        HttpResponse<String> response = client
+                .send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println(response.body());
+
+        ResponseSlots slotsResponse = objectMapper.readValue(response.body(), ResponseSlots.class);
+        System.out.println(slotsResponse.getSender_id());
+        System.out.println(slotsResponse.getSlot());
+        return null;
+
     }
 }

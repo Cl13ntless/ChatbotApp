@@ -29,7 +29,7 @@ nlu:
     - Bist du ein chatbot?
     - Bist du ein Mensch
     - Spreche ich mit einem Bot?
-    - spreche ichmit einem Menschen?
+    - spreche ich mit einem Menschen?
     - Wer bist du?
     - Was kannst du? 
     - Was tust du? 
@@ -59,7 +59,8 @@ nlu:
     - Wetter [nächste Woche](kommende Woche)
     - Temperatur [nächste Woche](kommende Woche)
     - [nächste Woche](kommende Woche)
-    - Temperatur für nächste Woche
+    - Temperatur für [nächste Woche](kommende Woche)
+
     
 
 - intent: city_weather
@@ -92,6 +93,25 @@ nlu:
     - Temperatur [nächste Woche](kommende Woche) in Wolfratshausen
     - [nächste Woche](kommende Woche) in Kassel
     - Mainz Temperatur für nächste Woche
+
+- intent: other_day
+  examples: |
+    - und [morgen](morgen)?
+    - und [kommende Woche](kommende Woche)?
+    - und [heute](heute)?
+
+- intent: other_city
+  examples: |
+    - und in Bielefeld?
+    - und in Moskau?
+    - und in Berlin?
+    - und in Stockholm?
+    - und in London
+    - und in Köln?
+    - und in New York?
+    - und in Los Angeles?
+    - und in Paris?
+    - und in München?
 
 - lookup: heute
   examples: |
