@@ -4,7 +4,7 @@ import com.chatbot.websocket.responseMapperChatbot.ResponseChatbot;
 import com.chatbot.websocket.responseMapperIntent.Entity;
 import com.chatbot.websocket.responseMapperIntent.ResponseIntent;
 import com.chatbot.websocket.responseMapperSlots.ResponseSlots;
-import com.chatbot.websocket.responseMapperSlots.Slot;
+import com.chatbot.websocket.responseMapperSlots.Slots;
 import com.chatbot.websocket.responseMapperWeather.Weather;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,6 +21,8 @@ public class RasaService {
     String RASA_URL = "http://localhost:5005/model/parse";
     String RASA_CONVERSATIONS_URL = "http://localhost:5005/webhooks/rest/webhook";
     String RASA_SLOT_URL = "http://localhost:5005/conversations/test_user/tracker";
+
+    String RASA_EMPTY_SLOT_URL = "http://localhost:5005/conversations/test_user/tracker/events";
     LocalDate today = LocalDate.now();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     ObjectMapper objectMapper = new ObjectMapper();
@@ -104,7 +106,7 @@ public class RasaService {
         }
     }
 
-    public Slot getSetSlots() throws Exception{
+    public Slots getSetSlots() throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -117,10 +119,22 @@ public class RasaService {
 
         System.out.println(response.body());
 
-        ResponseSlots slotsResponse = objectMapper.readValue(response.body(), ResponseSlots.class);
-        System.out.println(slotsResponse.getSender_id());
-        System.out.println(slotsResponse.getSlot());
-        return null;
+        ResponseSlots responseWeather = objectMapper.readValue(response.body(), ResponseSlots.class);
+        System.out.println(responseWeather.getSlots().getTomorrow());
+        return responseWeather.getSlots();
 
+    }
+
+    public void emptySetSlots() throws Exception{
+        var values = new HashMap<String, Object>() {{
+            put("event", "slot");
+            put("name", "tomorrow");
+            put("value", null );
+            put("timestamp", 0);
+        }};
+
+        String requestBody = objectMapper.writeValueAsString(values);
+
+        HttpResponse<String> chatResponse = postRequestRasa(RASA_EMPTY_SLOT_URL, requestBody);
     }
 }

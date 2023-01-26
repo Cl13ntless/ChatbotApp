@@ -2,15 +2,15 @@ package com.chatbot.websocket.responseMapperSlots;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-public class Slot {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Slots {
+
+    public Slots(){}
 
     String location;
     String today;
     String tomorrow;
     String next_week;
-
-
-    public Slot(){}
 
     public String getLocation() {
         return location;

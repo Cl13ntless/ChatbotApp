@@ -2,16 +2,13 @@ package com.chatbot.websocket.responseMapperSlots;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ResponseSlots {
-    Slot slots;
-    String sender_id;
-
     public ResponseSlots(){}
 
-    public Slot getSlot() {return slots;}
+    Slots slots;
 
-    public String getSender_id() {
-        return sender_id;
+    public Slots getSlots() {
+        return slots;
     }
 }

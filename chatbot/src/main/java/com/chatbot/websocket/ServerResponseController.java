@@ -21,24 +21,7 @@ public class ServerResponseController {
     @SendTo("/topic/weather")
     public ServerResponse serverResponse(ClientPrompt prompt) throws Exception {
         ResponseIntent mappedResponse = rasaService.getInitialParameters(HtmlUtils.htmlEscape(prompt.getText()));
-        if(Objects.equals(mappedResponse.getIntent().getName(),"other_day" ) || Objects.equals(mappedResponse.getIntent().getName(),"other_city")){
-            if(rasaService.getSetSlots().getLocation() == null){
-                Entity requestedDay = mappedResponse.getEntities()[0];
-                String lat = weatherservice.getLat();
-                String lon = weatherservice.getLon();
-                return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + weatherservice.getReverseGeolocation(lat,lon)+ " "
-                        + requestedDay.getEntity() + " sind " + rasaService.getRequestedCityWeather(requestedDay, lat, lon).getTemperature() + " Grad Celsius.");
-            }
-            if(rasaService.getSetSlots().getLocation() != null){
-                Geolocation geolocation = weatherservice.getGeolocation(rasaService.getSetSlots().getLocation().replaceAll(" ","/"));
-                String lat = String.valueOf(geolocation.getLatitude());
-                String lon = String.valueOf(geolocation.getLongitude());
-                Entity requestedDay = mappedResponse.getEntities()[0];
-                String city = rasaService.getSetSlots().getLocation();
-                return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + " "
-                        + requestedDay.getEntity() + " sind " + rasaService.getRequestedCityWeather(requestedDay, lat, lon).getTemperature() + " Grad Celsius.");
-            }
-        }
+
         if (mappedResponse.getEntities().length > 2) {
             return createErrorResponse();
         }
