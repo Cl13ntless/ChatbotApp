@@ -23,6 +23,9 @@ export class WebSocketAPI {
             _this.stompClient.subscribe("/topic/currentLoc", function (sdkEvent: any) {
                 _this.onLocationReceived(sdkEvent);
             });
+            _this.stompClient.subscribe("/topic/icon", function (sdkEvent: any) {
+                _this.onIconReceived(sdkEvent);
+            });
             //_this.stompClient.reconnect_delay = 2000;
         }, this.errorCallBack);
     };
@@ -49,17 +52,23 @@ export class WebSocketAPI {
     _send(message: any) {
         console.log(message);
         console.log("calling logout api via web socket");
-        this.stompClient.send("/app/inquiry", {}, JSON.stringify(message));
+        this.stompClient.send("/app/inquiry", {}, JSON.stringify(message));  
     }
 
     _sendLocation(lon: number, lat: number) {
         console.log("calling logout api via web socket");
         this.stompClient.send("/app/lat", {}, JSON.stringify(lat));
         this.stompClient.send("/app/lon", {}, JSON.stringify(lon));
-
     }
 
+    _sendIconRequest() {
+        console.log("calling logout api via web socket");
+        this.stompClient.send("/app/icon",{});
+    }
+
+
     onMessageReceived(message: any) {
+        this._sendIconRequest();
         console.log("Message Recieved from Server :: " + message);
         this.chatComponent.handleMessage(JSON.parse(message.body).content);
     }
@@ -69,4 +78,8 @@ export class WebSocketAPI {
         this.chatComponent.updateCurrentLocation(JSON.parse(location.body).content);
     }
 
+    onIconReceived(icon: any){
+        console.log("Icon Recieved from Server :: " + JSON.parse(icon.body).content);
+        if(icon){this.chatComponent.addWeatherImage(JSON.parse(icon.body).content)}
+    }
 }

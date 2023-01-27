@@ -10,11 +10,8 @@ intents:
   - other_city
 
 entities:
-  - heute
-  - morgen
-  - kommende Woche
   - LOC
-  - MISC
+  - time
 
 slots:
   location:
@@ -22,21 +19,11 @@ slots:
     mappings:
     - type: from_entity
       entity: LOC
-  today:
-    type: text
+  time:
+    type: any
     mappings:
     - type: from_entity
-      entity: heute
-  tomorrow:
-    type: text
-    mappings:
-    - type: from_entity
-      entity: morgen
-  next_week:
-    type: text
-    mappings:
-    - type: from_entity
-      entity:  kommende Woche
+      entity: time
   
 
 

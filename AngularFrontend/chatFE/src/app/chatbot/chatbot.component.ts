@@ -24,7 +24,7 @@ export class ChatbotComponent implements OnInit, OnDestroy{
     this.webSocketAPI._connect();
   }
 
-  handleUserMessage(event: any) {
+  handleUserMessage(event: any): void {
     console.log(event);
     const text = event.message;
     this.addUserMessage(text);
@@ -32,7 +32,7 @@ export class ChatbotComponent implements OnInit, OnDestroy{
     this.webSocketAPI._send(text);
   }
 
-  addUserMessage(text: string) {
+  addUserMessage(text: string): void {
     this.messages.push({
       text,
       sender: 'Julius Figge',
@@ -42,7 +42,7 @@ export class ChatbotComponent implements OnInit, OnDestroy{
     });
   }
 
-  addBotMessage(text: string) {
+  addBotMessage(text: string): void {
     this.messages.push({
       text,
       sender: 'Bot',
@@ -52,7 +52,18 @@ export class ChatbotComponent implements OnInit, OnDestroy{
     window.scroll(0,document.body.scrollHeight);
   }
 
-  handleMessage(message:any){
+  addWeatherImage(toDisplay?: any): void{
+
+    var files = [ { url: `/assets/${toDisplay}.png`, type: 'image/png' } ];
+    this.messages.push({
+      avatar: '/assets/bot.jpeg',
+      type: 'file',
+      files: files,
+    });
+    window.scroll(0,document.body.scrollHeight);
+  }
+
+  handleMessage(message:any): void{
     this.addBotMessage(message);
       this.loading = false;
 

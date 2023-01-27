@@ -7,6 +7,7 @@ pipeline:
   - name: SpacyFeaturizer
   - name: SpacyEntityExtractor
     model: de_core_news_lg
+    dimensions: ["LOC"]
   - name: LexicalSyntacticFeaturizer
   - name: CountVectorsFeaturizer
     analyzer: char_wb
@@ -15,6 +16,12 @@ pipeline:
   - name: DIETClassifier
     epochs: 100
     constrain_similarities: true
+  - name: "DucklingEntityExtractor"
+    url: "http://duckling:8000"
+    dimensions: ["time"]
+    locale: "de_DE"
+    timezone: "Europe/Berlin"
+    timeout : 3
 policies:
 # # No configuration for policies was provided. The following default policies were used to train your model.
 # # If you'd like to customize them, uncomment and adjust the policies.

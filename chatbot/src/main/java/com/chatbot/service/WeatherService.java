@@ -2,6 +2,7 @@ package com.chatbot.service;
 
 import com.chatbot.geolocation.Geolocation;
 import com.chatbot.geolocation.ReverseGeolocation;
+import com.chatbot.websocket.ServerResponseController;
 import com.chatbot.websocket.responseMapperWeather.ResponseWeather;
 import com.chatbot.websocket.responseMapperWeather.Weather;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,15 +13,29 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class WeatherService {
     ObjectMapper mapper = new ObjectMapper();
+
+    String currentLat = "52.03096758574192";
+    String currentLon = "8.537116459846818";
     String lat = "52.03096758574192";
     String lon = "8.537116459846818";
     String city = "Bielefeld";
     String country = "Deutschland";
     String housenumber = "69";
     String street = "Herforder Straße";
+    String day = "2023-01-27T08:00:00.000+01:00";
+    String weatherIcon;
+
+    String hour;
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd.MM.yyyy").withLocale(Locale.GERMANY);
 
     public void setLat(String lat) {
         this.lat = lat;
@@ -53,15 +68,72 @@ public class WeatherService {
         return street;
     }
 
-    public Weather cityWeatherApiCall(String date, String longitude, String latitude) throws Exception {
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public void setHousenumber(String housenumber) {
+        this.housenumber = housenumber;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public void setDay(String day) {
+        this.day = day;
+    }
+
+    public String getDay() {
+        OffsetDateTime dt = OffsetDateTime.parse(day, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        return formatter.format(dt);
+    }
+
+    public String getHour() {
+        OffsetDateTime dt = OffsetDateTime.parse(day, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        return DateTimeFormatter.ofPattern("HH").withLocale(Locale.GERMANY).format(dt);
+    }
+
+    public String getCurrentLat() {
+        return currentLat;
+    }
+
+    public void setCurrentLat(String currentLat) {
+        this.currentLat = currentLat;
+    }
+
+    public String getCurrentLon() {
+        return currentLon;
+    }
+
+    public void setCurrentLon(String currentLon) {
+        this.currentLon = currentLon;
+    }
+
+    public String getWeatherIcon() {
+        return weatherIcon;
+    }
+
+    public void setWeatherIcon(String weatherIcon) {
+        this.weatherIcon = weatherIcon;
+    }
+
+    public Weather cityWeatherApiCall() throws Exception {
+        System.out.println("LAT: " + lat);
+        System.out.println("LON: " + lon);
+        System.out.println("DAY: " + day);
         URIBuilder builder = new URIBuilder();
         builder.setScheme("https")
                 .setHost("api.brightsky.dev")
                 .setPath("/weather")
-                .addParameter("lat",latitude)
-                .addParameter("lon",longitude)
-                .addParameter("date",date+"T14:00")
-                .addParameter("last_date",date+"T14:00");
+                .addParameter("lat",lat)
+                .addParameter("lon",lon)
+                .addParameter("date",day)
+                .addParameter("last_date",day);
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -72,13 +144,18 @@ public class WeatherService {
         HttpResponse<String> response = client
                 .send(request, HttpResponse.BodyHandlers.ofString());
 
+        System.out.println(response.body());
         ResponseWeather responseWeather = mapper.readValue(response.body(), ResponseWeather.class);
         Weather[] weathers = responseWeather.getWeather();
+        weatherIcon = weathers[0].getIcon();
         return weathers[0];
     }
 
     public Geolocation getGeolocation(String location) throws Exception {
-        location = location.replaceAll("&uuml;","ue").replaceAll("&Auml;","ae").replaceAll("&ouml;","oe");
+        location = location.replaceAll("&uuml;","ue")
+                .replaceAll("&Auml;","ae")
+                .replaceAll("&ouml;","oe")
+                .replaceAll(" ","/");
         URIBuilder builder = new URIBuilder();
         builder.setScheme("https")
                 .setHost("api.api-ninjas.com")
@@ -100,13 +177,13 @@ public class WeatherService {
         return geolocations[0];
     }
 
-    public String getReverseGeolocation(String lat, String lon) throws Exception{
+    public String getReverseGeolocation() throws Exception{
         URIBuilder builder = new URIBuilder();
         builder.setScheme("https")
                 .setHost("api.geoapify.com")
                 .setPath("/v1/geocode/reverse")
-                .addParameter("lat",lat)
-                .addParameter("lon",lon)
+                .addParameter("lat",currentLat)
+                .addParameter("lon",currentLon)
                 .addParameter("lang","de")
                 .addParameter("apiKey","5a48358bff2b4ff3a8d33b8b8a623dfc");
 

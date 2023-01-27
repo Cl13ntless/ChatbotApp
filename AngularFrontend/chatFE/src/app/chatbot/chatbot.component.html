@@ -6,12 +6,13 @@
          <button nbButton outline status="info" (click)="getLocation()">Submit your location!<nb-icon icon="navigation-2-outline"></nb-icon></button>
       </ng-template>
     <nb-chat-message *ngFor="let msg of messages"
-                     type="text"
+                     [type]="msg.type"
                      [message]="msg.text"
                      [reply]="msg.reply"
                      [sender]="msg.sender"
                      [date]="msg.date"
-                     [avatar]="msg.avatar">
+                     [avatar]="msg.avatar"
+                     [files]="msg.files">
 </nb-chat-message>
 
 

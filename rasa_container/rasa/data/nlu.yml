@@ -36,69 +36,82 @@ nlu:
     
 - intent: weather
   examples: |
-    - Wie warm wird es [heute](heute)?
-    - Wie warm ist es [jetzt](heute)
-    - Wie viel grad wird es [morgen](morgen) haben?
-    - Wie warm wird es [morgen](morgen)
-    - Temperatur der [nächsten Woche](kommende Woche)
-    - Wie warm wird es [kommende Woche](kommende Woche)
-    - [Aktuelle](heute) Temperatur
-    - Wie heiß ist es [gerade](heute)
-    - Sage mir die Temperatur für [kommende Woche](kommende Woche)
-    - Zeige mir die Temperatur für [morgen](morgen)
-    - Wie heiß wird es [morgen](morgen)?
-    - Wie kalt wird es [morgen](morgen)?
-    - Wie kalt wird es [heute](heute)?
-    - Wie kalt wird es [nächste Woche](kommende Woche)?
-    - Wie [ist](heute) das Wetter?
-    - Wie warm [ist](heute) es [heute](heute)?
-    - Wie warm [ist](heute) es?
-    - Wie [ist](heute) das Wetter?
-    - Wie [ist](heute) das Wetter [heute](heute)?
-    - Wie warm wird es [nächste Woche](kommende Woche)?
-    - Wetter [nächste Woche](kommende Woche)
-    - Temperatur [nächste Woche](kommende Woche)
-    - [nächste Woche](kommende Woche)
-    - Temperatur für [nächste Woche](kommende Woche)
+    - Wie warm wird es heute?
+    - Wie warm ist es jetzt
+    - Wie viel grad wird es morgen haben?
+    - Wie warm wird es morgen?
+    - Temperatur der nächsten Woche
+    - Wie warm wird es kommende Woche
+    - Aktuelle Temperatur
+    - Wie heiß ist es gerade
+    - Sage mir die Temperatur für kommende Woche
+    - Zeige mir die Temperatur für morgen
+    - Wie heiß wird es morgen?
+    - Wie kalt wird es morgen?
+    - Wie kalt wird es heute?
+    - Wie kalt wird es nächste Woche?
+    - Wie ist das Wetter?
+    - Wie warm ist es heute?
+    - Wie warm ist es?
+    - Wie ist das Wetter?
+    - Wie ist das Wetter heute?
+    - Wie warm wird es nächste Woche?
+    - Wetter nächste Woche
+    - Temperatur nächste Woche
+    - nächste Woche
+    - Temperatur für nächste Woche
+    - Wie wird das Wetter in 7 Tagen
+    - Wie wird das Wetter am Dienstag?
+    - Wetter heute
+    - Wetter morgen 
+    - Wetter mittwoch 
+    - Wetter am 2 Februar
 
     
 
 - intent: city_weather
   examples: |
-    - Wie warm ist es [gerade](heute) in Tokio?
-    - [Aktuelle](heute) Temperatur in London?
-    - Wie [ist](heute) die Temperatur heute in Amsterdam? 
-    - Wie warm wird es [heute](heute) in München?
-    - Wie warm ist es [jetzt](heute) in Berlin?
-    - Wie viel grad wird es [morgen](morgen) in New York haben?
-    - Wie warm wird es [morgen](morgen) in Sydney?
-    - Temperatur der [nächsten Woche](kommende Woche) in Madrid?
-    - Wie warm wird es [kommende Woche](kommende Woche) in Rotterdamm?
-    - Wie heiß ist es [gerade](heute) in Pensyllvania?
-    - Sage mir die Temperatur für [kommende Woche](kommende Woche) in Wien
-    - Zeige mir die Temperatur für [morgen](morgen) in Köln
-    - Wie heiß wird es [morgen](morgen) in Bielefeld?`
-    - Wie kalt wird es [morgen](morgen) in Rom?
-    - Wie kalt wird es [heute](heute) in Dubai?
-    - Wie kalt wird es [nächste Woche](kommende Woche) in Budapest?
-    - [Aktuelle](heute) Temperatur Würzburg
-    - Wie [ist](heute) das Wetter in Budapest?
-    - Wie [ist](heute) das Wetter in Prag?
-    - Wie warm [ist](heute) es [heute](heute) in Stuttgart?
-    - Wie warm [ist](heute) es in Tokyo?
-    - Wie [ist](heute) das Wetter in Singapur?
-    - Wie [ist](heute) das Wetter [heute](heute) in Madrid?
-    - Wie warm wird es [nächste Woche](kommende Woche) in Athen?
-    - Wetter [nächste Woche](kommende Woche) in Geretsried
-    - Temperatur [nächste Woche](kommende Woche) in Wolfratshausen
-    - [nächste Woche](kommende Woche) in Kassel
-    - Mainz Temperatur für nächste Woche
+    - Wie warm ist es gerade in Tokio?
+    - Aktuelle Temperatur in London?
+    - Wie ist die Temperatur heute in Amsterdam? 
+    - Wie warm wird es heute in München?
+    - Wie warm ist es jetzt in Berlin?
+    - Wie viel grad wird es morgen in New York haben?
+    - Wie warm wird es morgen in Sydney?
+    - Temperatur der nächsten Woche in Madrid?
+    - Wie warm wird es kommende Woche in Rotterdamm?
+    - Wie heiß ist es gerade in Pensyllvania?
+    - Sage mir die Temperatur für kommende Woche in Wien
+    - Zeige mir die Temperatur für morgen in Köln
+    - Wie heiß wird es morgen in Bielefeld?`
+    - Wie kalt wird es morgen in Rom?
+    - Wie kalt wird es heute in Dubai?
+    - Wie kalt wird es nächste Woche in Budapest?
+    - Aktuelle Temperatur Würzburg
+    - Wie ist das Wetter in Budapest?
+    - Wie ist das Wetter in Prag?
+    - Wie warm ist es heute in Stuttgart?
+    - Wie warm ist es in Tokyo?
+    - Wie ist das Wetter in Singapur?
+    - Wie ist das Wetter heute in Madrid?
+    - Wie warm wird es nächste Woche in Athen?
+    - Wetter nächste Woche in Geretsried
+    - Temperatur nächste Woche in Wolfratshausen
+    - Wetter Dienstag in Kassel
+    - Mainz Temperatur für Mittwoch um 16 Uhr
+    - Wie ist das Wetter in Berlin in 7 Tagen um 15 Uhr?
 
 - intent: other_day
   examples: |
-    - und [morgen](morgen)?
-    - und [kommende Woche](kommende Woche)?
-    - und [heute](heute)?
+    - und morgen?
+    - und kommende Woche?
+    - und heute?
+    - und montag?
+    - und Dienstag ? 
+    - und Mittwoch? 
+    - und am Freitag? 
+    - und am Samstag?
+    - und am Sonntag?
 
 - intent: other_city
   examples: |
@@ -112,18 +125,3 @@ nlu:
     - und in Los Angeles?
     - und in Paris?
     - und in München?
-
-- lookup: heute
-  examples: |
-    - heute
-    - gerade
-    - jetzt
-    
-- lookup: morgen
-  examples: |
-    - morgen
-
-- lookup: kommende Woche
-  examples: |
-    - kommende Woche
-    - nächste Woche
