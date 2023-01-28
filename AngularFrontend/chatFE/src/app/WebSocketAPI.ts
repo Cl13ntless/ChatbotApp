@@ -80,6 +80,6 @@ export class WebSocketAPI {
 
     onIconReceived(icon: any){
         console.log("Icon Recieved from Server :: " + JSON.parse(icon.body).content);
-        if(icon){this.chatComponent.addWeatherImage(JSON.parse(icon.body).content)}
+        if(JSON.parse(icon.body).content != null){this.chatComponent.addWeatherImage(JSON.parse(icon.body).content)}
     }
 }

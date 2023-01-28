@@ -1,5 +1,8 @@
 package com.chatbot.websocket;
 
+import com.chatbot.exception.GeolocationException;
+import com.chatbot.exception.ReverseGeolocationException;
+import com.chatbot.exception.WeatherAPIException;
 import com.chatbot.geolocation.Geolocation;
 import com.chatbot.service.RasaService;
 import com.chatbot.service.WeatherService;
@@ -24,25 +27,30 @@ public class ServerResponseController {
 
     @MessageMapping("/inquiry")
     @SendTo("/topic/weather")
-    public ServerResponse serverResponse(ClientPrompt prompt) throws Exception {
+    public ServerResponse serverResponse(ClientPrompt prompt){
         Latest_Message lm = rasaService.getLatestMessage();
         ResponseIntent mappedResponse = rasaService.getInitialParameters(HtmlUtils.htmlEscape(prompt.getText()));
         mapToSlots(mappedResponse);
-
-        if (mappedResponse.getEntities().length > 2) {
-            return createErrorResponse();
-        }
 
         if (Objects.equals(mappedResponse.getIntent().getName(), "weather")) {
             if (mappedResponse.getEntities().length != 1) {
                 return createErrorResponse();
             }
             //Wetter für standarmäßigen Standort / Standort wird von Wetter API abgefragt
-
             String requestedDay = weatherService.getDay();
-            return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + weatherService.getReverseGeolocation()
+            try{
+
+                return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + weatherService.getReverseGeolocation()
                     + " am " + requestedDay + " um " + weatherService.getHour() +
                     " Uhr beträgt " +  weatherService.cityWeatherApiCall().getTemperature() + " Grad Celcius");
+
+            } catch (ReverseGeolocationException e){
+                e.printStackTrace();
+                System.out.println("Couldn't get Reverse Geolocation");
+            } catch (WeatherAPIException e){
+                e.printStackTrace();
+                System.out.println("Couldn't reach Weather API");
+            }
 
         } else if (Objects.equals(mappedResponse.getIntent().getName(), "city_weather")) {
 
@@ -50,16 +58,18 @@ public class ServerResponseController {
                 return createErrorResponse();
             }
             //Wenn eine Stadt übergeben wird müssen lat und lon geholt und der WetterAPI Call abhängig von ihnen gemacht werden
-
             String day = weatherService.getDay();
             String city = weatherService.getCity()
                     .replaceAll("&uuml;","ü")
                     .replaceAll("&Auml;","ä")
                     .replaceAll("&ouml;","ö");
-            Double temp = weatherService.cityWeatherApiCall().getTemperature();
-
-            return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city  + " am " + day + " um " + weatherService.getHour() +
-                    " Uhr beträgt " +  weatherService.cityWeatherApiCall().getTemperature() + " Grad Celcius");
+            try {
+                return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + " am " + day + " um " + weatherService.getHour() +
+                        " Uhr beträgt " + weatherService.cityWeatherApiCall().getTemperature() + " Grad Celcius");
+            } catch (WeatherAPIException e){
+                e.printStackTrace();
+                System.out.println("Couldn't reach Weather API");
+            }
 
         } else if ((Objects.equals(mappedResponse.getIntent().getName(), "other_day") || Objects.equals(mappedResponse.getIntent().getName(), "other_city")) && (Objects.equals(lm.getIntent().getName(),"weather") || Objects.equals(lm.getIntent().getName(),"city_weather"))) {
 
@@ -74,9 +84,13 @@ public class ServerResponseController {
                     .replaceAll("&Auml;","ä")
                     .replaceAll("&ouml;","ö");
 
-            return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city  + " am " + day + " um " + weatherService.getHour() +
-                    " Uhr beträgt " +  weatherService.cityWeatherApiCall().getTemperature() + " Grad Celcius");
-
+            try {
+                return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + " am " + day + " um " + weatherService.getHour() +
+                        " Uhr beträgt " + weatherService.cityWeatherApiCall().getTemperature() + " Grad Celcius");
+            } catch (WeatherAPIException e){
+                e.printStackTrace();
+                System.out.println("Couldn't reach Weather API");
+            }
         }
 
         if (mappedResponse.getEntities().length != 0) {
@@ -88,25 +102,36 @@ public class ServerResponseController {
     }
 
     @MessageMapping("/lat")
-    public void getLat(String lat) throws Exception{
+    public void getLat(String lat){
         System.out.println(lat);
         weatherService.setCurrentLat(lat);
+        try{
         weatherService.getReverseGeolocation();
+        } catch ( ReverseGeolocationException e){
+            e.printStackTrace();
+            System.out.println("Couldn't Get Reverse Geolocation");
+        }
+
     }
 
     @MessageMapping("/lon")
     @SendTo("/topic/currentLoc")
-    public ServerResponse getLon(String lon) throws Exception{
+    public ServerResponse getLon(String lon){
         System.out.println(lon);
         weatherService.setCurrentLon(lon);
-        weatherService.getReverseGeolocation();
+        try{
+            weatherService.getReverseGeolocation();
+        } catch ( ReverseGeolocationException e ){
+            e.printStackTrace();
+            System.out.println("Couldn't Get Reverse Geolocation");
+        }
         return new ServerResponse("Aktuelle Position: " + weatherService.getCity() + " " + weatherService.getStreet()
                 + " " + weatherService.getHousenumber()+ " , " + weatherService.getCountry());
     }
 
     @MessageMapping("/icon")
     @SendTo("/topic/icon")
-    public ServerResponse sendIcon() throws Exception{
+    public ServerResponse sendIcon(){
         if(List.of(intentNames).contains(rasaService.getLatestMessage().getIntent().getName())){
             return new ServerResponse(weatherService.getWeatherIcon());
         }
@@ -117,15 +142,21 @@ public class ServerResponseController {
         return new ServerResponse("Huch! Ich scheine dich nicht richtig verstanden zu haben. Versuche es nochmal! Achte auf deine Rechtschreibung!");
     }
 
-    public void mapToSlots(ResponseIntent response) throws Exception{
+    public void mapToSlots(ResponseIntent response){
         if(response.getEntities().length == 2){
             weatherService.setCity(response.getEntities()[0].getValue().replaceAll("\\?",""));
             weatherService.setDay(response.getEntities()[1].getValue());
-            Geolocation geolocation = weatherService.getGeolocation(weatherService.getCity());
-            System.out.println(weatherService.getLon());
-            weatherService.setLat(String.valueOf(geolocation.getLatitude()));
-            weatherService.setLon(String.valueOf(geolocation.getLongitude()));
-            System.out.println(weatherService.getLon());
+            try{
+                Geolocation geolocation = weatherService.getGeolocation(weatherService.getCity());
+                System.out.println(weatherService.getLon());
+                weatherService.setLat(String.valueOf(geolocation.getLatitude()));
+                weatherService.setLon(String.valueOf(geolocation.getLongitude()));
+                System.out.println(weatherService.getLon());
+            } catch ( GeolocationException e ){
+                e.printStackTrace();
+                System.out.println("Geolocation could not be mapped!");
+            }
+
         }
         if(response.getEntities().length == 1 && Objects.equals(response.getIntent().getName(),"weather" )){
             weatherService.setDay(response.getEntities()[0].getValue());
@@ -137,9 +168,17 @@ public class ServerResponseController {
 
         if(response.getEntities().length == 1 && Objects.equals(response.getIntent().getName(),"other_city" )){
             weatherService.setCity(response.getEntities()[0].getValue().replaceAll("\\?",""));
-            Geolocation geolocation = weatherService.getGeolocation(weatherService.getCity());
-            weatherService.setLat(String.valueOf(geolocation.getLatitude()));
-            weatherService.setLon(String.valueOf(geolocation.getLongitude()));
+
+            try{
+                Geolocation geolocation = weatherService.getGeolocation(weatherService.getCity());
+                System.out.println(weatherService.getLon());
+                weatherService.setLat(String.valueOf(geolocation.getLatitude()));
+                weatherService.setLon(String.valueOf(geolocation.getLongitude()));
+                System.out.println(weatherService.getLon());
+            } catch ( GeolocationException e ){
+                e.printStackTrace();
+                System.out.println("Geolocation could not be mapped!");
+            }
         }
     }
 
