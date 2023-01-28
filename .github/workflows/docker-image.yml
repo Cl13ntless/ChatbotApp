@@ -13,33 +13,12 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        name: Build & push Docker image
+        uses: mr-smithers-excellent/docker-build-push@v5
         with:
-          driver: docker
-          install: true
-      -
-        name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
+          image: cl13ntl3ss/chatbotapp
+          tags: latest
+          registry: docker.io
+          dockerfile: rasa_container/Dockerfile
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: Cl13ntless
-          password: ${{ secrets.PAT_TOKEN }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./rasa_container/Dockerfile
-          push: true
-          tags: |
-            ghcr.io/cl3ntless/chatbotapp:latest
+          password: ${{ secrets.DOCKER_PASSWORD }}
