@@ -1,6 +1,6 @@
 services:
   rasa:
-    image: rasaserver8
+    image: cl13ntl3ss/chatbotapp
     ports:
       - 5005:5005
     depends_on:
@@ -10,4 +10,5 @@ services:
     image: rasa/duckling
     ports:
       - 8000:8000
+  
   
