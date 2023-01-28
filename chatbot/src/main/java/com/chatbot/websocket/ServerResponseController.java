@@ -25,7 +25,7 @@ public class ServerResponseController {
     @MessageMapping("/inquiry")
     @SendTo("/topic/weather")
     public ServerResponse serverResponse(ClientPrompt prompt) throws Exception{
-        Thread.sleep(1000); // simulated delay
+        Thread.sleep(1000); // simulated delayyy
         System.out.println(HtmlUtils.htmlEscape(prompt.getText()));
         rasaService.executePost(HtmlUtils.htmlEscape(prompt.getText()));
         return new ServerResponse("The Temperature for tommorow is going to be " + weatherservice.weatherApiCall("2023-01-20T15:00") + " Degrees Celcius.");
