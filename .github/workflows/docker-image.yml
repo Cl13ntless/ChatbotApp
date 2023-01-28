@@ -36,5 +36,4 @@ jobs:
           file: ./rasa_container/Dockerfile
           push: true
           tags: |
-            cl3ntl3ss/chatbotapp:latest
             ghcr.io/cl3ntless/chatbotapp:latest
