@@ -36,5 +36,5 @@ jobs:
           file: ./rasa_container/Dockerfile
           push: true
           tags: |
-            percy/Backend:latest
-            ghcr.io/Cl13ntless/rasa:latest
+            Cl3ntless/chatbotapp:latest
+            ghcr.io/Cl3ntless/chatbotapp:latest
