@@ -13,12 +13,22 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Build & push Docker image
+        name: Build & push Rasa Docker image
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
           image: cl13ntl3ss/rasa_container
           tags: latest
           registry: docker.io
           dockerfile: rasa_container/Dockerfile
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      -
+        name: Build & push Backend Docker image
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          image: cl13ntl3ss/chatbotapp
+          tags: latest
+          registry: docker.io
+          dockerfile: chatbot/Dockerfile
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
