@@ -1,0 +1,13 @@
+services:
+  rasa:
+    image: rasaserver8
+    ports:
+      - 5005:5005
+    depends_on:
+     - duckling
+     
+  duckling:
+    image: rasa/duckling
+    ports:
+      - 8000:8000
+  

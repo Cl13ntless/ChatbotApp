@@ -6,6 +6,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Weather {
     double temperature;
 
+    String icon;
+
+    public String getIcon() {
+        return icon;
+    }
+
     public double getTemperature() {
         return temperature;
     }

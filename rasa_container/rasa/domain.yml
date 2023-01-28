@@ -1,0 +1,54 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - bot_challenge
+  - weather
+  - city_weather
+  - other_day
+  - other_city
+
+entities:
+  - LOC
+  - time
+
+slots:
+  location:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: LOC
+  time:
+    type: any
+    mappings:
+    - type: from_entity
+      entity: time
+  
+
+
+responses:
+  utter_greet:
+  - text: "Hey!"
+
+  utter_goodbye:
+  - text: "Tschüss!"
+
+  utter_iamabot:
+  - text: "Ich bin ein Wetter Chatbot, der die aktuelle und zukünftige Temperatur in verschiedenen Städten anzeigen kann."
+
+  utter_weather:
+  - text: "Weather!"
+
+  utter_city_weather:
+  - text: "City Weather"
+
+  utter_other_day:
+  - text: "Other Day!"
+
+  utter_other_city:
+  - text: "Other City"
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

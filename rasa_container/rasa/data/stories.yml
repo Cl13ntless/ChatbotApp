@@ -1,0 +1,21 @@
+version: "3.1"
+
+stories:
+
+- story: happy path
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: bot_challenge
+  - action: utter_iamabot
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: greet and weather
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: weather
+  - intent: goodbye
+  - action: utter_goodbye
+

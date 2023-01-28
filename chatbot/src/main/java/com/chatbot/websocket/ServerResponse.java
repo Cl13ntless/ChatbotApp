@@ -3,9 +3,10 @@ package com.chatbot.websocket;
 public class ServerResponse {
     public String content;
 
-    public ServerResponse(){}
+    public ServerResponse() {
+    }
 
-    public ServerResponse(String content){
+    public ServerResponse(String content) {
         this.content = content;
     }
 
