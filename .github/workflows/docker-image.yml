@@ -16,7 +16,7 @@ jobs:
         name: Build & push Docker image
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
-          image: cl13ntl3ss/chatbotapp
+          image: cl13ntl3ss/rasa_container
           tags: latest
           registry: docker.io
           dockerfile: rasa_container/Dockerfile
