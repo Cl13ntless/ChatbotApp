@@ -22,7 +22,6 @@ import java.util.Objects;
 public class ServerResponseController {
     RasaService rasaService = new RasaService();
     WeatherService weatherService = new WeatherService();
-
     String[] intentNames = {"weather","city_weather","other_day","other_city"};
 
     @MessageMapping("/inquiry")
