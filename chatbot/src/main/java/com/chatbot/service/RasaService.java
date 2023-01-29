@@ -18,11 +18,11 @@ import java.sql.SQLOutput;
 import java.util.HashMap;
 
 public class RasaService {
-    String RASA_URL = "http://localhost:5005/model/parse";
-    String RASA_CONVERSATIONS_URL = "http://localhost:5005/webhooks/rest/webhook";
-    String RASA_SLOT_URL = "http://localhost:5005/conversations/test_user/tracker";
+    String RASA_URL = "http://rasa:5005/model/parse";
+    String RASA_CONVERSATIONS_URL = "http://rasa:5005/webhooks/rest/webhook";
+    String RASA_SLOT_URL = "http://rasa:5005/conversations/test_user/tracker";
 
-    String RASA_EMPTY_SLOT_URL = "http://localhost:5005/conversations/test_user/tracker/events";
+    String RASA_EMPTY_SLOT_URL = "http://rasa:5005/conversations/test_user/tracker/events";
     ObjectMapper objectMapper = new ObjectMapper();
 
     public ResponseIntent getInitialParameters(String urlParameters) {

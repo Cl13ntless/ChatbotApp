@@ -3,12 +3,28 @@ services:
     image: cl13ntl3ss/chatbotapp
     ports:
       - 5005:5005
+    networks:
+      - mynetwork
     depends_on:
-     - duckling
+      - duckling
+   
      
   duckling:
     image: rasa/duckling
     ports:
       - 8000:8000
+    networks:
+      - mynetwork
+      
+  backend:
+    image: backend
+    ports:
+      - 8080:8080
+    networks:
+      - mynetwork
+    depends_on:
+      - rasa
+   
   
-  
+networks:
+  mynetwork:
