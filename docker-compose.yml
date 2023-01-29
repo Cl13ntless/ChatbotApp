@@ -1,6 +1,6 @@
 services:
   rasa:
-    image: cl13ntl3ss/chatbotapp
+    image: cl13ntl3ss/rasa_container
     ports:
       - 5005:5005
     networks:
@@ -17,13 +17,23 @@ services:
       - mynetwork
       
   backend:
-    image: backend
+    image: cl13ntl3ss/chatbotapp
     ports:
       - 8080:8080
     networks:
       - mynetwork
     depends_on:
       - rasa
+      
+  frontend:
+    image: frontend
+    ports:
+      - 4200:4200
+    networks:
+      - mynetwork
+    depends_on:
+      - backend
+   
    
   
 networks:

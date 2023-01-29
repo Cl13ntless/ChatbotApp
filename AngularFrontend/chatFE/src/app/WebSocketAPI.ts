@@ -4,7 +4,7 @@ import { AppComponent } from './app.component';
 import { ChatbotComponent } from './chatbot/chatbot.component';
 
 export class WebSocketAPI {
-    webSocketEndPoint: string = 'http://localhost:8080/gs-guide-websocket';
+    webSocketEndPoint: string = 'http://backend:8080/gs-guide-websocket';
     topic: string = "/topic/weather";
     stompClient: any;
     chatComponent: ChatbotComponent;
@@ -47,12 +47,12 @@ export class WebSocketAPI {
 
  /**
   * Send message to sever via web socket
-  * @param {*} message 
+  * @param {*} message
   */
     _send(message: any) {
         console.log(message);
         console.log("calling logout api via web socket");
-        this.stompClient.send("/app/inquiry", {}, JSON.stringify(message));  
+        this.stompClient.send("/app/inquiry", {}, JSON.stringify(message));
     }
 
     _sendLocation(lon: number, lat: number) {

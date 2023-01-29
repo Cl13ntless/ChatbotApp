@@ -9,7 +9,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NbThemeModule, NbLayoutModule, NbChatModule, NbSpinnerModule, NbButtonComponent, NbButtonModule, NbIconModule } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { ChatbotComponent } from './chatbot/chatbot.component';
-import { WebsocketService } from './websocket.service';
 
 
 @NgModule({
@@ -31,7 +30,7 @@ import { WebsocketService } from './websocket.service';
     NbIconModule,
     FormsModule
   ],
-  providers: [WebsocketService],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
