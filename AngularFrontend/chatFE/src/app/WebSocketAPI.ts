@@ -4,7 +4,7 @@ import { AppComponent } from './app.component';
 import { ChatbotComponent } from './chatbot/chatbot.component';
 
 export class WebSocketAPI {
-    webSocketEndPoint: string = 'http://backend:8080/gs-guide-websocket';
+    webSocketEndPoint: string = 'http://localhost:8080/gs-guide-websocket';
     topic: string = "/topic/weather";
     stompClient: any;
     chatComponent: ChatbotComponent;

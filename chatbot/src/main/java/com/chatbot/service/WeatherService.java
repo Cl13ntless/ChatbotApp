@@ -5,7 +5,6 @@ import com.chatbot.exception.ReverseGeolocationException;
 import com.chatbot.exception.WeatherAPIException;
 import com.chatbot.geolocation.Geolocation;
 import com.chatbot.geolocation.ReverseGeolocation;
-import com.chatbot.websocket.ServerResponseController;
 import com.chatbot.websocket.responseMapperWeather.ResponseWeather;
 import com.chatbot.websocket.responseMapperWeather.Weather;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,14 +12,11 @@ import org.apache.hc.core5.net.URIBuilder;
 
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -127,11 +123,12 @@ public class WeatherService {
         this.weatherIcon = weatherIcon;
     }
 
-    public Weather cityWeatherApiCall() throws WeatherAPIException {
+    public Weather cityWeatherApiCall(boolean currentPos) throws WeatherAPIException {
         System.out.println("LAT: " + lat);
         System.out.println("LON: " + lon);
         System.out.println("DAY: " + day);
         URIBuilder builder = new URIBuilder();
+        if(!currentPos){
         builder.setScheme("https")
                 .setHost("api.brightsky.dev")
                 .setPath("/weather")
@@ -139,6 +136,15 @@ public class WeatherService {
                 .addParameter("lon",lon)
                 .addParameter("date",day)
                 .addParameter("last_date",day);
+        } else {
+            builder.setScheme("https")
+                    .setHost("api.brightsky.dev")
+                    .setPath("/weather")
+                    .addParameter("lat",currentLat)
+                    .addParameter("lon",currentLon)
+                    .addParameter("date",day)
+                    .addParameter("last_date",day);
+        }
 
         try{
         HttpClient client = HttpClient.newHttpClient();

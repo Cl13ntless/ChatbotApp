@@ -14,7 +14,6 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.util.HtmlUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,7 +40,7 @@ public class ServerResponseController {
 
                 return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + weatherService.getReverseGeolocation()
                     + " am " + requestedDay + " um " + weatherService.getHour() +
-                    " Uhr beträgt " +  weatherService.cityWeatherApiCall().getTemperature() + " Grad Celcius");
+                    " Uhr beträgt " +  weatherService.cityWeatherApiCall(true).getTemperature() + " Grad Celcius");
 
             } catch (ReverseGeolocationException e){
                 e.printStackTrace();
@@ -64,7 +63,7 @@ public class ServerResponseController {
                     .replaceAll("&ouml;","ö");
             try {
                 return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + " am " + day + " um " + weatherService.getHour() +
-                        " Uhr beträgt " + weatherService.cityWeatherApiCall().getTemperature() + " Grad Celcius");
+                        " Uhr beträgt " + weatherService.cityWeatherApiCall(false).getTemperature() + " Grad Celcius");
             } catch (WeatherAPIException e){
                 e.printStackTrace();
                 System.out.println("Couldn't reach Weather API");
@@ -85,7 +84,7 @@ public class ServerResponseController {
 
             try {
                 return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + " am " + day + " um " + weatherService.getHour() +
-                        " Uhr beträgt " + weatherService.cityWeatherApiCall().getTemperature() + " Grad Celcius");
+                        " Uhr beträgt " + weatherService.cityWeatherApiCall(false).getTemperature() + " Grad Celcius");
             } catch (WeatherAPIException e){
                 e.printStackTrace();
                 System.out.println("Couldn't reach Weather API");
