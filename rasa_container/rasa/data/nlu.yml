@@ -116,6 +116,12 @@ nlu:
     - und am Samstag?
     - und am Sonntag?
     - und in 4 Tagen?
+    - und morgen um 17 uhr?
+    - und Freitag um 16 Uhr?
+    - und Mittwoch um 2 Uhr?
+    - und Sonntag um 21 Uhr?
+    - und heute um 15 Uhr?
+    - und Samstag um 12?
 
 - intent: other_city
   examples: |
