@@ -51,6 +51,9 @@ public class ServerResponseController {
             }
 
         } else if (Objects.equals(mappedResponse.getIntent().getName(), "city_weather")) {
+            if (mappedResponse.getEntities().length != 2) {
+                return createErrorResponse();
+            }
             //Wenn eine Stadt übergeben wird müssen lat und lon geholt und der WetterAPI Call abhängig von ihnen gemacht werden
             String day = weatherService.getDay();
             String city = weatherService.getCity()
