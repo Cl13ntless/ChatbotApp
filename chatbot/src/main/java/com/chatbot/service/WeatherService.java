@@ -268,6 +268,10 @@ public class WeatherService {
             System.out.println("Http Connection got Interrupted");
             e.printStackTrace();
             throw new ReverseGeolocationException("Connection got Interrupted");
+        } catch(NullPointerException e){
+            System.out.println("Lat and Lon Values couldnt be read");
+            e.printStackTrace();
+            throw new ReverseGeolocationException("Lat and Lon Values couldnt be read");
         }
     }
 }
