@@ -175,6 +175,10 @@ public class WeatherService {
             System.out.println("Http Connection got Interrupted");
             e.printStackTrace();
             throw new WeatherAPIException("Connection got Interrupted");
+        } catch (ArrayIndexOutOfBoundsException e){
+            System.out.println("No Weather Data Returned!");
+            e.printStackTrace();
+            throw new WeatherAPIException("No Weather Data");
         }
     }
 
@@ -202,6 +206,7 @@ public class WeatherService {
 
             Geolocation[] geolocations = mapper.readValue(response.body(), Geolocation[].class);
 
+            System.out.println(response.body());
             return geolocations[0];
         } catch(IOException e){
             System.out.println("IO Exception");
@@ -215,6 +220,10 @@ public class WeatherService {
             System.out.println("Http Connection got Interrupted");
             e.printStackTrace();
             throw new GeolocationException("Connection got Interrupted");
+        } catch(ArrayIndexOutOfBoundsException e){
+            System.out.println("There was no Geolocation Returned!");
+            e.printStackTrace();
+            throw new GeolocationException("No Geolocation Returned!");
         }
     }
 
@@ -245,6 +254,7 @@ public class WeatherService {
         street = reverseGeolocations.getFeatures()[0].getProperties().getStreet();
         housenumber = reverseGeolocations.getFeatures()[0].getProperties().getHousenumber();
         country = reverseGeolocations.getFeatures()[0].getProperties().getCountry();
+        System.out.println("Reverse Geolocation von: " + city);
         return city;
         } catch(IOException e){
             System.out.println("IO Exception");
