@@ -17,7 +17,8 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: google-github-actions/setup-gcloud@master
+        name: Google Auth
+        uses: google-github-actions/setup-gcloud@master
         with:
           service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
           project_id: ${{ env.PROJECT_ID }}
@@ -43,13 +44,13 @@ jobs:
         run: docker build -t frontend_image:latest /AngularFrontend/chatFE
       -
         name: Configure Docker Client
-        run:
+        run: |-
           gcloud auth configure-docker --quiet
       -
         name: Push Docker Image to Container Registry (GCR)
         env:
           GIT_TAG: v.0.1.0
-        run: 
+        run: |-
           docker tag frontend_image:latest gcr.io/$PROJECT_ID/frontend_image:latest
           docker tag frontend_image:latest gcr.io/$PROJECT_ID/frontend_image:$GIT_TAG
           docker tag backend_image:latest gcr.io/$PROJECT_ID/backend_image:latest
