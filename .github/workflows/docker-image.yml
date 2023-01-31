@@ -26,11 +26,10 @@ jobs:
         name: Build & push Rasa Docker image
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
-          directory: rasa_container
           image: cl13ntl3ss/rasa_container
           tags: latest
           registry: docker.io
-          dockerfile: Dockerfile
+          directory: rasa_container
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
