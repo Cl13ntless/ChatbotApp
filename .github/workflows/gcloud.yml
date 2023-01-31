@@ -35,13 +35,13 @@ jobs:
         run: mvn clean install --file chatbot/pom.xml
       -
         name: Build Rasa Docker Image
-        run: docker build -t rasa_image:latest /rasa_container
+        run: docker build -t rasa_image:latest rasa_container
       -
         name: Build Backend Docker Image
-        run: docker build -t backend_image:latest /chatbot
+        run: docker build -t backend_image:latest chatbot
       -
         name: Build Frontend Docker Image
-        run: docker build -t frontend_image:latest /AngularFrontend/chatFE
+        run: docker build -t frontend_image:latest AngularFrontend/chatFE
       -
         name: Configure Docker Client
         run: |-
