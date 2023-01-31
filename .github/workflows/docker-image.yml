@@ -26,7 +26,7 @@ jobs:
         name: Build & push Rasa Docker image
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
-          context: rasa_container
+          directory: rasa_container
           image: cl13ntl3ss/rasa_container
           tags: latest
           registry: docker.io
@@ -37,7 +37,7 @@ jobs:
         name: Build & push Backend Docker image
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
-          context: chatbot
+          directory: chatbot
           image: cl13ntl3ss/chatbotapp
           tags: latest
           registry: docker.io
@@ -48,7 +48,7 @@ jobs:
         name: Build & push Frontend Docker Image
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
-          context: AngularFrontend/chatFE
+          directory: AngularFrontend/chatFE
           image: cl13ntl3ss/chatbotfrontend
           tags: latest
           registry: docker.io
