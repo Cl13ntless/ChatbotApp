@@ -20,9 +20,8 @@ jobs:
         name: Google Auth
         uses: jacobsvante/setup-gcloud-with-docker-auth-action@v0.1.1
         with:
-          service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-          project_id: ${{ env.PROJECT_ID }}
-          export_default-credentials: true 
+          gcp-credentials-json: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+          gcp-project-id: ${{ env.PROJECT_ID }}
       -
         name: Set up JDK 17
         uses: actions/setup-java@v3
