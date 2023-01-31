@@ -9,6 +9,8 @@ public class Property {
     String housenumber;
     String country;
 
+    String country_code;
+
     public Property(){}
 
     public String getCity() {
@@ -42,4 +44,6 @@ public class Property {
     public void setCountry(String country) {
         this.country = country;
     }
+
+    public String getCountry_code() { return country_code; }
 }

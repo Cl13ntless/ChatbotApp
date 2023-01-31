@@ -7,6 +7,7 @@ public class Geolocation {
     String name;
     double latitude;
     double longitude;
+    String country;
 
     public Geolocation() {
     }
@@ -23,5 +24,7 @@ public class Geolocation {
         return name;
     }
 
-
+    public String getCountry() {
+        return country;
+    }
 }

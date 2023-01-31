@@ -42,10 +42,11 @@ public class ServerResponseController {
             }
             //Wetter für standarmäßigen Standort / Standort wird von Wetter API abgefragt
             String requestedDay = weatherService.getDay();
+            String countryCode = weatherService.getCountryCode().toUpperCase();
             try{
 
                 return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + weatherService.getReverseGeolocation()
-                    + " am " + requestedDay + " um " + weatherService.getHour() +
+                        + "," + countryCode + " am " + requestedDay + " um " + weatherService.getHour() +
                     " Uhr beträgt " +  weatherService.cityWeatherApiCall(true).getTemperature() + " Grad Celcius");
 
             } catch (ReverseGeolocationException e){
@@ -66,8 +67,9 @@ public class ServerResponseController {
                     .replaceAll("&uuml;","ü")
                     .replaceAll("&Auml;","ä")
                     .replaceAll("&ouml;","ö");
+            String countryCode = weatherService.getCountryCode().toUpperCase();
             try {
-                return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + " am " + day + " um " + weatherService.getHour() +
+                return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode + " am " + day + " um " + weatherService.getHour() +
                         " Uhr beträgt " + weatherService.cityWeatherApiCall(false).getTemperature() + " Grad Celcius");
             } catch (WeatherAPIException e){
                 e.printStackTrace();
@@ -86,9 +88,10 @@ public class ServerResponseController {
                     .replaceAll("&uuml;","ü")
                     .replaceAll("&Auml;","ä")
                     .replaceAll("&ouml;","ö");
+            String countryCode = weatherService.getCountryCode().toUpperCase();
 
             try {
-                return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + " am " + day + " um " + weatherService.getHour() +
+                return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode +" am " + day + " um " + weatherService.getHour() +
                         " Uhr beträgt " + weatherService.cityWeatherApiCall(false).getTemperature() + " Grad Celcius");
             } catch (WeatherAPIException e){
                 e.printStackTrace();

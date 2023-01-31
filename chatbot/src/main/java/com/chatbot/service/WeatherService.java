@@ -36,6 +36,8 @@ public class WeatherService {
 
     String hour;
 
+    String countryCode = "DE";
+
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd.MM.yyyy").withLocale(Locale.GERMANY);
 
     public void setLat(String lat) {
@@ -88,6 +90,10 @@ public class WeatherService {
     public void setDay(String day) {
         this.day = day;
     }
+
+    public String getCountryCode() {return countryCode;}
+
+    public void setCountryCode(String countryCode) {this.countryCode = countryCode;}
 
     public String getDay() {
         OffsetDateTime dt = OffsetDateTime.parse(day, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
@@ -205,6 +211,7 @@ public class WeatherService {
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
             Geolocation[] geolocations = mapper.readValue(response.body(), Geolocation[].class);
+            setCountryCode(geolocations[0].getCountry());
 
             System.out.println(response.body());
             return geolocations[0];
@@ -250,6 +257,7 @@ public class WeatherService {
         System.out.println(response.body());
 
         ReverseGeolocation reverseGeolocations = mapper.readValue(response.body(), ReverseGeolocation.class);
+        setCountryCode(reverseGeolocations.getFeatures()[0].getProperties().getCountry_code());
         city = reverseGeolocations.getFeatures()[0].getProperties().getCity();
         street = reverseGeolocations.getFeatures()[0].getProperties().getStreet();
         housenumber = reverseGeolocations.getFeatures()[0].getProperties().getHousenumber();
