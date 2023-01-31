@@ -11,6 +11,7 @@ import com.chatbot.websocket.responseMapperIntent.ResponseIntent;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
 import java.util.List;
@@ -21,6 +22,12 @@ public class ServerResponseController {
     RasaService rasaService = new RasaService();
     WeatherService weatherService = new WeatherService();
     String[] intentNames = {"weather", "city_weather", "other_day", "other_city"};
+    String city;
+    String countryCode;
+    String requestedDay;
+    String hour;
+    String temperature;
+
 
     @MessageMapping("/inquiry")
     @SendTo("/topic/weather")
@@ -35,75 +42,53 @@ public class ServerResponseController {
             return createErrorResponse();
         }
 
-        if (Objects.equals(mappedResponse.getIntent().getName(), "weather")) {
-            if (mappedResponse.getEntities().length != 1) {
-                return createErrorResponse();
+        city = StringUtils.capitalize(weatherService.getCity()
+                .replaceAll("&uuml;", "ü")
+                .replaceAll("&Auml;", "ä")
+                .replaceAll("&ouml;", "ö"));
+        countryCode = weatherService.getCountryCode().toUpperCase();
+        requestedDay = weatherService.getDay();
+        hour = weatherService.getHour();
+
+        try {
+
+            switch (mappedResponse.getIntent().getName()) {
+                case "weather":
+                    if (mappedResponse.getEntities().length != 1) {
+                        return createErrorResponse();
+                    }
+                    temperature = String.valueOf(weatherService.cityWeatherApiCall(true).getTemperature());
+                    break;
+                case "city_weather":
+                    if (mappedResponse.getEntities().length != 2) {
+                        return createErrorResponse();
+                    }
+                    temperature = String.valueOf(weatherService.cityWeatherApiCall(false).getTemperature());
+                    break;
+                case "other_day", "other_city":
+                    if (mappedResponse.getEntities().length != 1) {
+                        return createErrorResponse();
+                    }
+                    if (Objects.equals(lm.getIntent().getName(), "weather") || Objects.equals(lm.getIntent().getName(), "city_weather")) {
+                        temperature = String.valueOf(weatherService.cityWeatherApiCall(false).getTemperature());
+                        break;
+                    }
+                    return createErrorResponse();
+                default:
+                    if (mappedResponse.getEntities().length != 0 || mappedResponse.getIntent().getConfidence() < 0.9 ) {
+                        return createErrorResponse();
+                    }
+
+                    //Request zurück an Rasa für die standard Chatbot Antwort
+                    return new ServerResponse(rasaService.getChatResponse(HtmlUtils.htmlEscape(prompt.getText())));
+
             }
-            //Wetter für standarmäßigen Standort / Standort wird von Wetter API abgefragt
-            String requestedDay = weatherService.getDay();
-            String countryCode = weatherService.getCountryCode().toUpperCase();
-            try {
-
-                return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + weatherService.getReverseGeolocation()
-                        + "," + countryCode + " am " + requestedDay + " um " + weatherService.getHour() +
-                        " Uhr beträgt " + weatherService.cityWeatherApiCall(true).getTemperature() + " Grad Celcius");
-
-            } catch (ReverseGeolocationException e) {
-                e.printStackTrace();
-            } catch (WeatherAPIException e) {
-                e.printStackTrace();
-            }
-
-            return createErrorResponse();
-
-        } else if (Objects.equals(mappedResponse.getIntent().getName(), "city_weather")) {
-            if (mappedResponse.getEntities().length != 2) {
-                return createErrorResponse();
-            }
-            //Wenn eine Stadt übergeben wird müssen lat und lon geholt und der WetterAPI Call abhängig von ihnen gemacht werden
-            String day = weatherService.getDay();
-            String city = weatherService.getCity()
-                    .replaceAll("&uuml;", "ü")
-                    .replaceAll("&Auml;", "ä")
-                    .replaceAll("&ouml;", "ö");
-            String countryCode = weatherService.getCountryCode().toUpperCase();
-            try {
-                return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode + " am " + day + " um " + weatherService.getHour() +
-                        " Uhr beträgt " + weatherService.cityWeatherApiCall(false).getTemperature() + " Grad Celcius");
-            } catch (WeatherAPIException e) {
-                e.printStackTrace();
-                return createErrorResponse();
-            }
-
-        } else if ((Objects.equals(mappedResponse.getIntent().getName(), "other_day") || Objects.equals(mappedResponse.getIntent().getName(), "other_city")) && (Objects.equals(lm.getIntent().getName(), "weather") || Objects.equals(lm.getIntent().getName(), "city_weather"))) {
-
-            if (mappedResponse.getEntities().length != 1) {
-                return createErrorResponse();
-            }
-            //Wenn ein anderer Tag übergeben wird, wird mit den vorhandenen Daten eine Anfrage gestartet
-
-            String day = weatherService.getDay();
-            String city = weatherService.getCity()
-                    .replaceAll("&uuml;", "ü")
-                    .replaceAll("&Auml;", "ä")
-                    .replaceAll("&ouml;", "ö");
-            String countryCode = weatherService.getCountryCode().toUpperCase();
-
-            try {
-                return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode + " am " + day + " um " + weatherService.getHour() +
-                        " Uhr beträgt " + weatherService.cityWeatherApiCall(false).getTemperature() + " Grad Celcius");
-            } catch (WeatherAPIException e) {
-                e.printStackTrace();
-                return createErrorResponse();
-            }
+        } catch (WeatherAPIException e) {
+            e.printStackTrace();
         }
 
-        if (mappedResponse.getEntities().length != 0) {
-            return createErrorResponse();
-        }
-        //Request zurück an Rasa für die standard Chatbot Antwort
-
-        return new ServerResponse(rasaService.getChatResponse(HtmlUtils.htmlEscape(prompt.getText())));
+        return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode + " am "
+                + requestedDay + " um " + hour + " Uhr beträgt " + temperature + " Grad Celcius");
     }
 
     @MessageMapping("/lat")
