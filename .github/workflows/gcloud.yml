@@ -1,74 +1,58 @@
 # This is a basic workflow to help you get started with Actions
 name: CD
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+  
 jobs:
-  # This workflow contains a single job called "deploy"
-  deploy:
-    # The type of runner that the job will run on
+  build-and-push-gcr:
     runs-on: ubuntu-latest
-
-    # Add "id-token" with the intended permissions.
-    permissions:
-      contents: "read"
-      id-token: "write"
-
     env:
-      # Replace $PROJECT_ID with your project ID
-      IMAGE_NAME: gcr.io/chatbot-server-376112/app
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+      PROJECT_ID: chatbot-server-376112
+    permissions:
+      contents: read
+      packages: write
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        
-      - name: Set up JDK 17
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: google-github-actions/setup-gcloud@master
+        with:
+          service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+          project_id: ${{ env.PROJECT_ID }}
+          export_default-credentials: true 
+      -
+        name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-      - name: Build with Maven
+      - 
+        name: Build with Maven
         run: mvn clean install --file chatbot/pom.xml
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v0
-        with:
-          # Replace with your Workload Identity Provider Location
-          workload_identity_provider: "projects/535129812608/locations/global/workloadIdentityPools/gh-pool/providers/gh-provider"
-          # Replace with your GitHub Service Account
-          service_account: "github-actions-service-account@chatbot-server-376112.iam.gserviceaccount.com"
-
-      - name: Configure Docker
-        run: gcloud auth configure-docker --quiet
-
-      - name: Build Docker image
-        run: docker build ./chatbot -t springbackend
-
-      - name: Push Docker image
-        run: docker push springbackend
-
-      - id: deploy
-        name: Deploy Docker image
-        uses: "google-github-actions/deploy-cloudrun@v0"
-        with:
-          image: springbackend
-          region: us-central1
-          service: app
-          flags: --port=8080
-
-      # Example of using the output
-      - name: Test URL
-        run: curl "${{ steps.deploy.outputs.url }}"
+      -
+        name: Build Rasa Docker Image
+        run: docker build -t rasa_image:latest /rasa_container
+      -
+        name: Build Backend Docker Image
+        run: docker build -t backend_image:latest /chatbot
+      -
+        name: Build Frontend Docker Image
+        run: docker build -t frontend_image:latest /AngularFrontend/chatFE
+      -
+        name: Configure Docker Client
+        run: |-
+          gcloud auth configure-docker --quiet
+      -
+        name: Push Docker Image to Container Registry (GCR)
+        env:
+          GIT_TAG: v.0.1.0
+        run: |-
+          docker tag frontend_image:latest gcr.io/$PROJECT_ID/frontend_image:latest
+          docker tag frontend_image:latest gcr.io/$PROJECT_ID/frontend_image:$GIT_TAG
+          docker tag backend_image:latest gcr.io/$PROJECT_ID/backend_image:latest
+          docker tag backend_image:latest gcr.io/$PROJECT_ID/backend_image:$GIT_TAG
+          docker tag rasa_image:latest gcr.io/$PROJECT_ID/rasa_image:latest
+          docker tag rasa_image:latest gcr.io/$PROJECT_ID/rasa_image:$GIT_TAG
