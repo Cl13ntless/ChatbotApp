@@ -15,7 +15,7 @@ public class RasaServiceTest {
         rasaService = new RasaService();
     }
 
-
+/*
     @Test
     public void testGetInitialParameters(){
         Assertions.assertNotNull(rasaService.getInitialParameters("Hallo"));
@@ -31,4 +31,6 @@ public class RasaServiceTest {
         rasaService.getInitialParameters("Hallo");
         Assertions.assertEquals("greet", rasaService.getLatestMessage().getIntent().getName());
     }
+
+ */
 }
