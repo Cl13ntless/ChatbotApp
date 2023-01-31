@@ -26,10 +26,11 @@ jobs:
         name: Build & push Rasa Docker image
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
+          directory: rasa_container
           image: cl13ntl3ss/rasa_container
           tags: latest
           registry: docker.io
-          directory: rasa_container
+          dockerfile: rasa_container/Dockerfile
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
@@ -40,7 +41,7 @@ jobs:
           image: cl13ntl3ss/chatbotapp
           tags: latest
           registry: docker.io
-          dockerfile: Dockerfile
+          dockerfile: chatbot/Dockerfile
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
@@ -51,7 +52,7 @@ jobs:
           image: cl13ntl3ss/chatbotfrontend
           tags: latest
           registry: docker.io
-          dockerfile: Dockerfile
+          dockerfile: AngularFrontend/chatFE/Dockerfile
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
