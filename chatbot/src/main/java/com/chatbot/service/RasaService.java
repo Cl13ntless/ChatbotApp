@@ -22,15 +22,15 @@ public class RasaService {
     String RASA_CONVERSATIONS_URL = "http://rasa:5005/webhooks/rest/webhook";
     String RASA_SLOT_URL = "http://rasa:5005/conversations/test_user/tracker";
 
-    String RASA_EMPTY_SLOT_URL = "http://rasa:5005/conversations/test_user/tracker/events";
     ObjectMapper objectMapper = new ObjectMapper();
 
+    //Makes the first request to Rasa with user input to retrieve the correct intent
     public ResponseIntent getInitialParameters(String urlParameters) {
         var values = new HashMap<String, String>() {{
             put("text", urlParameters);
         }};
 
-        //send text to rasa to set slots
+        //send text to rasa to set the correct latest message
         var values2 = new HashMap<String, String>() {{
             put("sender", "test_user");
             put("message", urlParameters);
@@ -40,14 +40,10 @@ public class RasaService {
         String chatRequest = objectMapper.writeValueAsString(values2);
         HttpResponse<String> chatResponse = postRequestRasa(RASA_CONVERSATIONS_URL, chatRequest);
 
-
-
         String requestBody = objectMapper.writeValueAsString(values);
-
         HttpResponse<String> initialResponse = postRequestRasa(RASA_URL, requestBody);
 
         ResponseIntent mappedResponse = mapResponse(initialResponse.body());
-
         System.out.println(initialResponse.body());
 
         return mappedResponse;
@@ -61,6 +57,7 @@ public class RasaService {
         return null;
     }
 
+    //Send chat message to rasa chat endpoint and return rasa's response
     public String getChatResponse(String clientMessage) {
         var values = new HashMap<String, String>() {{
             put("sender", "test_user");
@@ -83,6 +80,7 @@ public class RasaService {
         return null;
     }
 
+    //Send a post request to a specified url with specified json String
     public HttpResponse<String> postRequestRasa(String url, String jsonValues) throws RasaRequestException {
 
         HttpClient client = HttpClient.newHttpClient();
@@ -105,6 +103,7 @@ public class RasaService {
         }
     }
 
+    //Map a response Intent Item from its JSON to a POJO
     public ResponseIntent mapResponse(String responseJson){
         try{
         ObjectMapper mapper = new ObjectMapper();
@@ -116,6 +115,7 @@ public class RasaService {
             return null;
         }
     }
+    //Get the Latest message received by RASA through the SLOT URL endpoint
     public Latest_Message getLatestMessage(){
         try{
         ObjectMapper objectMapper = new ObjectMapper();

@@ -27,6 +27,7 @@ public class ServerResponseController {
     String requestedDay;
     String hour;
     String temperature;
+    Double CONFIDENCE_THRESHOLD = 0.9;
 
 
     @MessageMapping("/inquiry")
@@ -34,6 +35,7 @@ public class ServerResponseController {
     public ServerResponse serverResponse(ClientPrompt prompt) {
         Latest_Message lm = rasaService.getLatestMessage();
         ResponseIntent mappedResponse = rasaService.getInitialParameters(HtmlUtils.htmlEscape(prompt.getText()));
+
         try {
             mapToSlots(mappedResponse);
         } catch (GeolocationException e) {
@@ -59,32 +61,37 @@ public class ServerResponseController {
                     }
                     temperature = String.valueOf(weatherService.cityWeatherApiCall(true).getTemperature());
                     break;
+
                 case "city_weather":
                     if (mappedResponse.getEntities().length != 2) {
                         return createErrorResponse();
                     }
                     temperature = String.valueOf(weatherService.cityWeatherApiCall(false).getTemperature());
                     break;
+
                 case "other_day", "other_city":
                     if (mappedResponse.getEntities().length != 1) {
                         return createErrorResponse();
                     }
-                    if (Objects.equals(lm.getIntent().getName(), "weather") || Objects.equals(lm.getIntent().getName(), "city_weather")) {
-                        temperature = String.valueOf(weatherService.cityWeatherApiCall(false).getTemperature());
+                    if (Objects.equals(lm.getIntent().getName(), "weather")) {
+                        temperature = String.valueOf(weatherService.cityWeatherApiCall(true).getTemperature());
                         break;
+                    } else if (Objects.equals(lm.getIntent().getName(), "city_weather")) {
+                        temperature = String.valueOf(weatherService.cityWeatherApiCall(false).getTemperature());
                     }
                     return createErrorResponse();
+
                 default:
-                    if (mappedResponse.getEntities().length != 0 || mappedResponse.getIntent().getConfidence() < 0.9 ) {
+                    if ( mappedResponse.getEntities().length != 0 || mappedResponse.getIntent().getConfidence() < CONFIDENCE_THRESHOLD ) {
                         return createErrorResponse();
                     }
-
                     //Request zurück an Rasa für die standard Chatbot Antwort
                     return new ServerResponse(rasaService.getChatResponse(HtmlUtils.htmlEscape(prompt.getText())));
 
             }
         } catch (WeatherAPIException e) {
             e.printStackTrace();
+            return createErrorResponse();
         }
 
         return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode + " am "
@@ -112,6 +119,7 @@ public class ServerResponseController {
             weatherService.getReverseGeolocation();
         } catch (ReverseGeolocationException e) {
             e.printStackTrace();
+            return createErrorResponse();
         }
         return new ServerResponse("Aktuelle Position: " + weatherService.getCity() + " " + weatherService.getStreet()
                 + " " + weatherService.getHousenumber() + " , " + weatherService.getCountry());

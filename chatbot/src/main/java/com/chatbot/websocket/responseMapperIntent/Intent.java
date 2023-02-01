@@ -2,7 +2,7 @@ package com.chatbot.websocket.responseMapperIntent;
 
 public class Intent {
     String name;
-    int confidence;
+    double confidence;
 
     public Intent() {
     }
@@ -15,11 +15,11 @@ public class Intent {
         this.name = name;
     }
 
-    public int getConfidence() {
+    public double getConfidence() {
         return confidence;
     }
 
-    public void setConfidence(int confidence) {
+    public void setConfidence(double confidence) {
         this.confidence = confidence;
     }
 }
