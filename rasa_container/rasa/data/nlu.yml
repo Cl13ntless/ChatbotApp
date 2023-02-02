@@ -10,9 +10,26 @@ nlu:
     - guten tag
     - hey
     - guten morgen
+    - Hello
+    - good bye
+    - Hello
+    - Hello there
+    - good day
+    - hey
+    - Good morning
 
 - intent: goodbye
   examples: |
+    - tschüss
+    - tschau
+    - bis später
+    - gute nacht
+    - bye
+    - goodbye
+    - einen schönen tag dir noch
+    - man sieht sich
+    - bye bye
+    - see you later
     - tschüss
     - tschau
     - bis später
@@ -33,6 +50,13 @@ nlu:
     - Wer bist du?
     - Was kannst du? 
     - Was tust du? 
+    - Are you a chatbot?
+    - Are you human
+    - Am I talking to a bot?
+    - am I talking to a person?
+    - Who are you?
+    - What can you?
+    - What you are doing?
     
 - intent: weather
   examples: |
@@ -59,6 +83,29 @@ nlu:
     - Wie wird das Wetter um 18 Uhr?
     - Wie wird das Wetter um 20 Uhr?
     - Wie wird das Wetter um 6 Uhr?
+    - How warm will it be today?
+    - How warm is it now
+    - How many degrees will it be tomorrow?
+    - How warm will it be tomorrow?
+    - Show me the temperature for tomorrow
+    - How hot will it be tomorrow?
+    - How cold will it be tomorrow?
+    - How cold will it be today?
+    - What's the weather like?
+    - How warm is it today?
+    - How warm is it?
+    - What's the weather like?
+    - How is the weather today?
+    - How will the weather be in 7 days
+    - How will the weather be on Tuesday?
+    - Weather today
+    - Weather tomorrow
+    - Weather Wednesday
+    - Weather on February 2nd
+    - How we the weather on February 5 at 4 p.m.?
+    - How will the weather be at 6 p.m.?
+    - How will the weather be at 8 p.m.?
+    - How will the weather be at 6 o'clock?
 
     
 
@@ -105,6 +152,47 @@ nlu:
     - Wie ist das Wetter in Singapur?
     - Wie ist das Wetter heute in Madrid?
     - Wetter Dienstag in Kassel
+    - What is the temperature in Amsterdam today?
+    - How warm will it be in Munich today?
+    - How warm is it in Berlin now?
+    - How many degrees will it be in New York tomorrow?
+    - How warm will it be in Sydney tomorrow?
+    - How hot is it in Pennsylvania right now?
+    - Show me the temperature for tomorrow in Cologne
+    - How hot will it be in Bielefeld tomorrow?`
+    - How cold will it be in Rome tomorrow?
+    - How cold is it getting in Dubai today?
+    - Current temperature Wuerzburg
+    - How is the weather in Budapest?
+    - How is the weather in Prague?
+    - How warm is it in Stuttgart today?
+    - How warm is it in Tokyo?
+    - What's the weather like in Singapore?
+    - How is the weather today in Madrid?
+    - Weather Tuesday in Kassel
+    - Mainz temperature for Wednesday at 4 p.m
+    - How is the weather in Berlin in 7 days at 3 p.m.?
+    - How will the weather be on Monday at 3 p.m. in Berlin?
+    - What will the weather be like tomorrow at 6 p.m. in Moscow?
+    - What is the temperature today in Amsterdam at 12 o'clock?
+    - How warm will it be in Munich at 6 p.m. today?
+    - How warm is it in New York right now?
+    - How many degrees will it be in New York tomorrow?
+    - How warm will it be in Sydney tomorrow?
+    - How hot is it in Pennsylvania right now?
+    - Show me the temperature for tomorrow in Cologne
+    - How hot will it be in Bielefeld tomorrow?`
+    - How cold will it be in Rome tomorrow?
+    - How cold is it getting in Dubai today?
+    - Current temperature Wuerzburg
+    - How is the weather in Budapest?
+    - How is the weather in Prague?
+    - How warm is it in Stuttgart today?
+    - How warm is it in Tokyo?
+    - What's the weather like in Singapore?
+    - How is the weather today in Madrid?
+    - Weather Tuesday in Kassel
+
 
 
 - intent: other_day
@@ -125,6 +213,22 @@ nlu:
     - und Sonntag um 21 Uhr?
     - und heute um 15 Uhr?
     - und Samstag um 12?
+    - and tomorrow?
+    - and in 7 days?
+    - and today?
+    - and monday?
+    - and Tuesday?
+    - and Wednesday?
+    - and on Friday?
+    - and on Saturday?
+    - and on Sunday?
+    - and in 4 days?
+    - and tomorrow at 5 p.m.?
+    - and Friday at 4 p.m.?
+    - and Wednesday at 2 o'clock?
+    - and Sunday at 9 p.m.?
+    - and today at 3 p.m.?
+    - and Saturday at 12?
 
 - intent: other_city
   examples: |
@@ -138,3 +242,13 @@ nlu:
     - und in Los Angeles?
     - und in Paris?
     - und in München?
+    - and in Bielefeld?
+    - and in Moscow?
+    - and in Berlin?
+    - and in Stockholm?
+    - and in London
+    - and in Cologne?
+    - and in New York?
+    - and in Los Angeles?
+    - and in Paris?
+    - and in Munich?

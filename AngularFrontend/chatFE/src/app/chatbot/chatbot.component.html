@@ -1,9 +1,10 @@
 <nb-chat title="Weather Chatbot" >
     <ng-template nbChatTitle>
-        <div class = "title">Weather Chatbot
+        <div class = "title">Weather Chatbot :
+            <nb-icon class="flag" icon="{{languageSVG}}" (click)="changeLanguage()"></nb-icon>
             <p name="location" ngDefaultControl [(ngModel)]="currentLocation" #ctrl="ngModel" required>{{currentLocation}}</p>
         </div>
-         <button nbButton outline status="info" (click)="getLocation()">Submit your location!<nb-icon icon="navigation-2-outline"></nb-icon></button>
+        <button nbButton outline status="info" (click)="getLocation()">Submit your location!<nb-icon icon="navigation-2-outline"></nb-icon></button>
       </ng-template>
     <nb-chat-message *ngFor="let msg of messages"
                      [type]="msg.type"
@@ -24,7 +25,7 @@
 </nb-chat-message>
 
 
-    <nb-chat-form (send)="handleUserMessage($event)" [dropFiles]="true">
+    <nb-chat-form (send)="handleUserMessage($event)" [dropFiles]="false">
     </nb-chat-form>
 
 </nb-chat>

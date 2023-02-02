@@ -61,11 +61,15 @@ export class WebSocketAPI {
         this.stompClient.send("/app/lon", {}, JSON.stringify(lon));
     }
 
-    _sendIconRequest() {
+    _sendIconRequest(): void {
         console.log("calling logout api via web socket");
         this.stompClient.send("/app/icon",{});
     }
 
+    _sendLanguageChange(): void {
+        console.log("Language has been changed!");
+        this.stompClient.send("/app/lang", {});
+    }
 
     onMessageReceived(message: any) {
         this._sendIconRequest();

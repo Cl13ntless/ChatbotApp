@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NbThemeService } from '@nebular/theme';
+import { NbIconLibraries, NbThemeService } from '@nebular/theme';
 import { WebSocketAPI } from '../WebSocketAPI';
 
 @Component({
@@ -15,8 +15,16 @@ export class ChatbotComponent implements OnInit, OnDestroy{
   currentLat: any;
   currentLon: any;
   currentLocation: string = "Aktuelle Position: Bielefeld Herforderstraße 69 , Deutschland";
+  languageSVG: string = "de"
 
-  constructor() {}
+  constructor(private iconLibraries: NbIconLibraries) {
+    this.iconLibraries.getPack("eva").icons.set(
+      "de", "<img src='./assets/de.svg' width='25px'/>"
+    )
+    this.iconLibraries.getPack("eva").icons.set(
+      "gb", "<img src='./assets/gb.svg' width='25px'/>"
+    )
+  }
 
   ngOnInit() {
     this.addBotMessage('Human presence detected 🤖. Wie kann ich dir behilflich sein? ');
@@ -91,4 +99,12 @@ export class ChatbotComponent implements OnInit, OnDestroy{
     this.currentLocation = location;
   }
 
+  changeLanguage(){
+    this.webSocketAPI._sendLanguageChange();
+    if(this.languageSVG == "de"){
+      this.languageSVG = "gb";
+    } else {
+      this.languageSVG = "de"
+    }
+  }
 }

@@ -5,6 +5,7 @@ import com.chatbot.exception.ReverseGeolocationException;
 import com.chatbot.exception.WeatherAPIException;
 import com.chatbot.geolocation.Geolocation;
 import com.chatbot.service.RasaService;
+import com.chatbot.service.TranslationService;
 import com.chatbot.service.WeatherService;
 import com.chatbot.websocket.ResponseLatestMessage.Latest_Message;
 import com.chatbot.websocket.responseMapperIntent.ResponseIntent;
@@ -19,6 +20,7 @@ import java.util.Objects;
 
 @Controller
 public class ServerResponseController {
+    TranslationService translationService = new TranslationService();
     RasaService rasaService = new RasaService();
     WeatherService weatherService = new WeatherService();
     String[] intentNames = {"weather", "city_weather", "other_day", "other_city"};
@@ -28,7 +30,7 @@ public class ServerResponseController {
     String hour;
     String temperature;
     Double CONFIDENCE_THRESHOLD = 0.9;
-
+    String currentLang = "de";
 
     @MessageMapping("/inquiry")
     @SendTo("/topic/weather")
@@ -39,8 +41,8 @@ public class ServerResponseController {
         try {
             mapToSlots(mappedResponse);
         } catch (GeolocationException e) {
-            e.printStackTrace();
-            System.out.println("Geolocation could not be mapped!");
+            return createErrorResponse();
+        } catch (ReverseGeolocationException e){
             return createErrorResponse();
         }
 
@@ -86,7 +88,7 @@ public class ServerResponseController {
                         return createErrorResponse();
                     }
                     //Request zurück an Rasa für die standard Chatbot Antwort
-                    return new ServerResponse(rasaService.getChatResponse(HtmlUtils.htmlEscape(prompt.getText())));
+                    return new ServerResponse(translateMessageIfNeeded(rasaService.getChatResponse(HtmlUtils.htmlEscape(prompt.getText()))));
 
             }
         } catch (WeatherAPIException e) {
@@ -94,8 +96,15 @@ public class ServerResponseController {
             return createErrorResponse();
         }
 
-        return new ServerResponse("Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode + " am "
-                + requestedDay + " um " + hour + " Uhr beträgt " + temperature + " Grad Celcius");
+        String response = "Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode + " am "
+                + requestedDay + " um " + hour + " Uhr beträgt " + temperature + " Grad Celcius";
+
+        if(Objects.equals(currentLang, "en")){
+            String responseEn = "Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode + " am "
+                    + requestedDay + " um " + hour + " Uhr - beträgt " + temperature + " Grad Celcius";
+            response = translationService.translateLongMessage(responseEn);
+        }
+        return new ServerResponse(response);
     }
 
     @MessageMapping("/lat")
@@ -121,8 +130,8 @@ public class ServerResponseController {
             e.printStackTrace();
             return createErrorResponse();
         }
-        return new ServerResponse("Aktuelle Position: " + weatherService.getCity() + " " + weatherService.getStreet()
-                + " " + weatherService.getHousenumber() + " , " + weatherService.getCountry());
+        return new ServerResponse(translateMessageIfNeeded("Aktuelle Position: " + weatherService.getCity() + " " + weatherService.getStreet()
+                + " " + weatherService.getHousenumber() + " , " + weatherService.getCountry()));
     }
 
     @MessageMapping("/icon")
@@ -136,10 +145,10 @@ public class ServerResponseController {
 
     public ServerResponse createErrorResponse() {
         weatherService.setWeatherIcon(null);
-        return new ServerResponse("Huch! Ich scheine dich nicht richtig verstanden zu haben. Versuche es nochmal! Achte auf deine Rechtschreibung!");
+        return new ServerResponse(translateMessageIfNeeded("Huch! Ich scheine dich nicht richtig verstanden zu haben. Versuche es nochmal! Achte auf deine Rechtschreibung!"));
     }
 
-    public void mapToSlots(ResponseIntent response) throws GeolocationException {
+    public void mapToSlots(ResponseIntent response) throws GeolocationException, ReverseGeolocationException {
         if (response.getEntities().length == 2) {
             Geolocation geolocation = weatherService.getGeolocation(response.getEntities()[0].getValue().replaceAll("\\?", ""));
             System.out.println(weatherService.getLon());
@@ -151,10 +160,12 @@ public class ServerResponseController {
         }
         if (response.getEntities().length == 1 && Objects.equals(response.getIntent().getName(), "weather")) {
             weatherService.setDay(response.getEntities()[0].getValue());
+            weatherService.getReverseGeolocation();
         }
 
         if (response.getEntities().length == 1 && Objects.equals(response.getIntent().getName(), "other_day")) {
             weatherService.setDay(response.getEntities()[0].getValue());
+            weatherService.getReverseGeolocation();
         }
 
         if (response.getEntities().length == 1 && Objects.equals(response.getIntent().getName(), "other_city")) {
@@ -167,4 +178,26 @@ public class ServerResponseController {
         }
     }
 
+    @MessageMapping("/lang")
+    public void changeLanguage(){
+        switch(currentLang) {
+            case "de":
+                currentLang = "en";
+                break;
+            case "en":
+                currentLang = "de";
+                break;
+        }
+    }
+
+    public String translateMessageIfNeeded(String toTranslate){
+        switch(currentLang){
+            case "de":
+                return toTranslate;
+            case "en":
+                return translationService.translate(toTranslate);
+        }
+        return toTranslate;
+    }
 }
+
