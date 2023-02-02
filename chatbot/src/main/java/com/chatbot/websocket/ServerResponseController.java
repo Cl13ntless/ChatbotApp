@@ -7,7 +7,6 @@ import com.chatbot.geolocation.Geolocation;
 import com.chatbot.service.RasaService;
 import com.chatbot.service.TranslationService;
 import com.chatbot.service.WeatherService;
-import com.chatbot.websocket.ResponseLatestMessage.Latest_Message;
 import com.chatbot.websocket.responseMapperIntent.Intent;
 import com.chatbot.websocket.responseMapperIntent.ResponseIntent;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -57,23 +56,14 @@ public class ServerResponseController {
 
             switch (mappedResponse.getIntent().getName()) {
                 case "weather":
-                    if (mappedResponse.getEntities().length != 1) {
-                        return createErrorResponse();
-                    }
                     temperature = String.valueOf(weatherService.cityWeatherApiCall(true).getTemperature());
                     break;
 
                 case "city_weather":
-                    if (mappedResponse.getEntities().length != 2) {
-                        return createErrorResponse();
-                    }
                     temperature = String.valueOf(weatherService.cityWeatherApiCall(false).getTemperature());
                     break;
 
                 case "other_day", "other_city":
-                    if (mappedResponse.getEntities().length != 1) {
-                        return createErrorResponse();
-                    }
                     if (Objects.equals(lastIntent.getName(), "weather")) {
                         temperature = String.valueOf(weatherService.cityWeatherApiCall(true).getTemperature());
                         break;
@@ -92,7 +82,7 @@ public class ServerResponseController {
                     return new ServerResponse(translateMessageIfNeeded(rasaService.getChatResponse(HtmlUtils.htmlEscape(prompt.getText()))));
 
             }
-        } catch (WeatherAPIException | NullPointerException e) {
+        } catch ( WeatherAPIException | NullPointerException e) {
             e.printStackTrace();
             return createErrorResponse();
         }
@@ -153,11 +143,11 @@ public class ServerResponseController {
 
     public ServerResponse createErrorResponse() {
         weatherService.setWeatherIcon(null);
-        return new ServerResponse(translateMessageIfNeeded("Entschuldigung ich konnte dich nicht wirklich verstehen.Versuche es nochmal! Achte auf deine Rechtschreibung!"));
+        return new ServerResponse(translateMessageIfNeeded("Entschuldigung ich konnte dich nicht wirklich verstehen.Versuche es nochmal und Achte auf deine Rechtschreibung!"));
     }
 
     public void mapToSlots(ResponseIntent response) throws GeolocationException, ReverseGeolocationException {
-        if (response.getEntities().length == 2 && Objects.equals(response.getIntent().getName(), "city_weather")) {
+        if (Objects.equals(response.getIntent().getName(), "city_weather")) {
             Geolocation geolocation = weatherService.getGeolocation(response.getEntities()[0].getValue().replaceAll("\\?", ""));
             System.out.println(weatherService.getLon());
             weatherService.setLat(String.valueOf(geolocation.getLatitude()));
@@ -166,16 +156,16 @@ public class ServerResponseController {
             weatherService.setCity(response.getEntities()[0].getValue().replaceAll("\\?", ""));
             weatherService.setDay(response.getEntities()[1].getValue());
         }
-        if (response.getEntities().length == 1 && Objects.equals(response.getIntent().getName(), "weather")) {
+        if (Objects.equals(response.getIntent().getName(), "weather")) {
             weatherService.setDay(response.getEntities()[0].getValue());
             weatherService.getReverseGeolocation();
         }
 
-        if (response.getEntities().length == 1 && Objects.equals(response.getIntent().getName(), "other_day")) {
+        if (Objects.equals(response.getIntent().getName(), "other_day")) {
             weatherService.setDay(response.getEntities()[0].getValue());
         }
 
-        if (response.getEntities().length == 1 && Objects.equals(response.getIntent().getName(), "other_city")) {
+        if (Objects.equals(response.getIntent().getName(), "other_city")) {
             Geolocation geolocation = weatherService.getGeolocation(response.getEntities()[0].getValue().replaceAll("\\?", ""));
             System.out.println(weatherService.getLon());
             weatherService.setLat(String.valueOf(geolocation.getLatitude()));

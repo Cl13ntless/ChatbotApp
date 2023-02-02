@@ -33,7 +33,6 @@ export class ChatbotComponent implements OnInit, OnDestroy{
     var ws = this.webSocketAPI;
     var component = this;
     setTimeout( function(){
-      ws._sendLocation(component.currentLon,component.currentLat);
       ws._sendLanguageChange(component.languageSVG);
     }, 800);
 

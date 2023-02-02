@@ -8,6 +8,7 @@ import com.chatbot.geolocation.ReverseGeolocation;
 import com.chatbot.websocket.responseMapperWeather.ResponseWeather;
 import com.chatbot.websocket.responseMapperWeather.Weather;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.hc.core5.net.URIBuilder;
 
 import java.io.IOException;
@@ -16,7 +17,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class WeatherService {
@@ -106,7 +110,7 @@ public class WeatherService {
 
     public String getHour() {
         OffsetDateTime dt = OffsetDateTime.parse(day, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        return DateTimeFormatter.ofPattern("HH").withLocale(Locale.GERMANY).format(dt);
+        return DateTimeFormatter.ofPattern("HH:mm").withLocale(Locale.GERMANY).format(dt);
     }
 
     public String getCurrentLat() {
@@ -137,6 +141,12 @@ public class WeatherService {
         System.out.println("LAT: " + lat);
         System.out.println("LON: " + lon);
         System.out.println("DAY: " + day);
+        OffsetDateTime dateTime = OffsetDateTime.parse(day);
+        Date requested = new Date(dateTime.toInstant().toEpochMilli());
+        requested = DateUtils.round(requested,Calendar.HOUR);
+        dateTime = requested.toInstant().atOffset(ZoneOffset.ofHours(1));
+        String roundedDay = dateTime.toString();
+
         URIBuilder builder = new URIBuilder();
         if (!currentPos) {
             builder.setScheme("https")
@@ -144,16 +154,16 @@ public class WeatherService {
                     .setPath("/weather")
                     .addParameter("lat", lat)
                     .addParameter("lon", lon)
-                    .addParameter("date", day)
-                    .addParameter("last_date", day);
+                    .addParameter("date", roundedDay)
+                    .addParameter("last_date", roundedDay);
         } else {
             builder.setScheme("https")
                     .setHost("api.brightsky.dev")
                     .setPath("/weather")
                     .addParameter("lat", currentLat)
                     .addParameter("lon", currentLon)
-                    .addParameter("date", day)
-                    .addParameter("last_date", day);
+                    .addParameter("date", roundedDay)
+                    .addParameter("last_date", roundedDay);
         }
 
         try {
