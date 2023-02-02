@@ -8,6 +8,7 @@ import com.chatbot.service.RasaService;
 import com.chatbot.service.TranslationService;
 import com.chatbot.service.WeatherService;
 import com.chatbot.websocket.ResponseLatestMessage.Latest_Message;
+import com.chatbot.websocket.responseMapperIntent.Intent;
 import com.chatbot.websocket.responseMapperIntent.ResponseIntent;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -31,11 +32,11 @@ public class ServerResponseController {
     String temperature;
     Double CONFIDENCE_THRESHOLD = 0.9;
     String currentLang = "de";
+    Intent lastIntent;
 
     @MessageMapping("/inquiry")
     @SendTo("/topic/weather")
     public ServerResponse serverResponse(ClientPrompt prompt) {
-        Latest_Message lm = rasaService.getLatestMessage();
         ResponseIntent mappedResponse = rasaService.getInitialParameters(HtmlUtils.htmlEscape(prompt.getText()));
 
         try {
@@ -73,10 +74,10 @@ public class ServerResponseController {
                     if (mappedResponse.getEntities().length != 1) {
                         return createErrorResponse();
                     }
-                    if (Objects.equals(lm.getIntent().getName(), "weather")) {
+                    if (Objects.equals(lastIntent.getName(), "weather")) {
                         temperature = String.valueOf(weatherService.cityWeatherApiCall(true).getTemperature());
                         break;
-                    } else if (Objects.equals(lm.getIntent().getName(), "city_weather")) {
+                    } else if (Objects.equals(lastIntent.getName(), "city_weather")) {
                         temperature = String.valueOf(weatherService.cityWeatherApiCall(false).getTemperature());
                         break;
                     }
@@ -86,15 +87,18 @@ public class ServerResponseController {
                     if ( mappedResponse.getEntities().length != 0 || mappedResponse.getIntent().getConfidence() < CONFIDENCE_THRESHOLD ) {
                         return createErrorResponse();
                     }
-                    //Request zurück an Rasa für die standard Chatbot Antwort
+                    //Request zurück an Rasa für die standard Chatbot Antwort und den Intent der der Nachricht für die nächste Nachricht setzen
+                    lastIntent = mappedResponse.getIntent();
                     return new ServerResponse(translateMessageIfNeeded(rasaService.getChatResponse(HtmlUtils.htmlEscape(prompt.getText()))));
 
             }
-        } catch (WeatherAPIException e) {
+        } catch (WeatherAPIException | NullPointerException e) {
             e.printStackTrace();
             return createErrorResponse();
         }
 
+        //Intent für die nächste nachricht setzen
+        lastIntent = mappedResponse.getIntent();
         String response = "Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode + " am "
                 + requestedDay + " um " + hour + " Uhr beträgt " + temperature + " Grad Celcius";
 
