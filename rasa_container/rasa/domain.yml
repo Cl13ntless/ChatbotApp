@@ -2,12 +2,30 @@ version: "3.1"
 
 intents:
   - greet
+      ignore_entities:
+        - LOC
+        - time
   - goodbye
+      ignore_entities:
+        - LOC
+        - time
   - bot_challenge
+      ignore_entities:
+        - LOC
+        - time
   - weather
+      ignore_entities:
+        - LOC
   - city_weather
+      use_entities:
+        - LOC
+        - time
   - other_day
+      ignore_entities:
+        - LOC
   - other_city
+      ignore_entities:
+        - time
 
 entities:
   - LOC
