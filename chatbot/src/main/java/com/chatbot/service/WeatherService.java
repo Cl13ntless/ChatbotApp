@@ -137,6 +137,7 @@ public class WeatherService {
         this.weatherIcon = weatherIcon;
     }
 
+    //Weather API Call mit Längen und Breitengraden
     public Weather cityWeatherApiCall(boolean currentPos) throws WeatherAPIException {
         System.out.println("LAT: " + lat);
         System.out.println("LON: " + lon);
