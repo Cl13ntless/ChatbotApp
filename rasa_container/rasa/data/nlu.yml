@@ -108,8 +108,6 @@ nlu:
     - How will the weather be at 6 o'clock?
     - What is the weather going to be like tomorrow at 6pm?
 
-    
-
 - intent: city_weather
   examples: |
     - Zeige mir die Temperatur für morgen um 17 Uhr in Köln
@@ -193,8 +191,6 @@ nlu:
     - What's the weather like in Singapore?
     - How is the weather today in Madrid?
     - Weather Tuesday in Kassel
-
-
 
 - intent: other_day
   examples: |
