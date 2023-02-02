@@ -40,9 +40,7 @@ public class ServerResponseController {
 
         try {
             mapToSlots(mappedResponse);
-        } catch (GeolocationException e) {
-            return createErrorResponse();
-        } catch (ReverseGeolocationException e){
+        } catch (GeolocationException | ReverseGeolocationException e) {
             return createErrorResponse();
         }
 
@@ -80,6 +78,7 @@ public class ServerResponseController {
                         break;
                     } else if (Objects.equals(lm.getIntent().getName(), "city_weather")) {
                         temperature = String.valueOf(weatherService.cityWeatherApiCall(false).getTemperature());
+                        break;
                     }
                     return createErrorResponse();
 
@@ -99,7 +98,7 @@ public class ServerResponseController {
         String response = "Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode + " am "
                 + requestedDay + " um " + hour + " Uhr beträgt " + temperature + " Grad Celcius";
 
-        if(Objects.equals(currentLang, "en")){
+        if(Objects.equals(currentLang, "gb")){
             String responseEn = "Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode + " am "
                     + requestedDay + " um " + hour + " Uhr - beträgt " + temperature + " Grad Celcius";
             response = translationService.translateLongMessage(responseEn);
@@ -128,10 +127,9 @@ public class ServerResponseController {
             weatherService.getReverseGeolocation();
         } catch (ReverseGeolocationException e) {
             e.printStackTrace();
-            return createErrorResponse();
         }
-        return new ServerResponse(translateMessageIfNeeded("Aktuelle Position: " + weatherService.getCity() + " " + weatherService.getStreet()
-                + " " + weatherService.getHousenumber() + " , " + weatherService.getCountry()));
+        return new ServerResponse(translateMessageIfNeeded("Aktuelle Position: " + weatherService.getCity() )+ " " + weatherService.getStreet()
+                + " " + weatherService.getHousenumber() + " , " + translateMessageIfNeeded(weatherService.getCountry()));
     }
 
     @MessageMapping("/icon")
@@ -143,13 +141,19 @@ public class ServerResponseController {
         return null;
     }
 
+    @MessageMapping("/lang")
+    public void changeLanguage(String language){
+        currentLang = language;
+        System.out.println(currentLang);
+    }
+
     public ServerResponse createErrorResponse() {
         weatherService.setWeatherIcon(null);
-        return new ServerResponse(translateMessageIfNeeded("Huch! Ich scheine dich nicht richtig verstanden zu haben. Versuche es nochmal! Achte auf deine Rechtschreibung!"));
+        return new ServerResponse(translateMessageIfNeeded("Entschuldigung ich konnte dich nicht wirklich verstehen.Versuche es nochmal! Achte auf deine Rechtschreibung!"));
     }
 
     public void mapToSlots(ResponseIntent response) throws GeolocationException, ReverseGeolocationException {
-        if (response.getEntities().length == 2) {
+        if (response.getEntities().length == 2 && Objects.equals(response.getIntent().getName(), "city_weather")) {
             Geolocation geolocation = weatherService.getGeolocation(response.getEntities()[0].getValue().replaceAll("\\?", ""));
             System.out.println(weatherService.getLon());
             weatherService.setLat(String.valueOf(geolocation.getLatitude()));
@@ -165,7 +169,6 @@ public class ServerResponseController {
 
         if (response.getEntities().length == 1 && Objects.equals(response.getIntent().getName(), "other_day")) {
             weatherService.setDay(response.getEntities()[0].getValue());
-            weatherService.getReverseGeolocation();
         }
 
         if (response.getEntities().length == 1 && Objects.equals(response.getIntent().getName(), "other_city")) {
@@ -178,23 +181,11 @@ public class ServerResponseController {
         }
     }
 
-    @MessageMapping("/lang")
-    public void changeLanguage(){
-        switch(currentLang) {
-            case "de":
-                currentLang = "en";
-                break;
-            case "en":
-                currentLang = "de";
-                break;
-        }
-    }
-
     public String translateMessageIfNeeded(String toTranslate){
         switch(currentLang){
             case "de":
                 return toTranslate;
-            case "en":
+            case "gb":
                 return translationService.translate(toTranslate);
         }
         return toTranslate;

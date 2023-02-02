@@ -12,7 +12,7 @@ public class TranslationService {
         try{
 
             System.out.println(toTranslate);
-            String result = GoogleTranslate.translate("en",toTranslate);
+            String result = GoogleTranslate.translate("gb",toTranslate);
             return result;
 
         } catch (IOException e){

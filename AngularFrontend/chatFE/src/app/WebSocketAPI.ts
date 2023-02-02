@@ -66,9 +66,10 @@ export class WebSocketAPI {
         this.stompClient.send("/app/icon",{});
     }
 
-    _sendLanguageChange(): void {
+    _sendLanguageChange(language: string): void {
         console.log("Language has been changed!");
-        this.stompClient.send("/app/lang", {});
+        this.stompClient.send("/app/lang", {}, language);
+        this._sendLocation(this.chatComponent.currentLon,this.chatComponent.currentLat);
     }
 
     onMessageReceived(message: any) {

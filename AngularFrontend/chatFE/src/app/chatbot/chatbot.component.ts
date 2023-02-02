@@ -12,10 +12,10 @@ export class ChatbotComponent implements OnInit, OnDestroy{
   webSocketAPI: WebSocketAPI;
   messages: any = [];
   loading = false;
-  currentLat: any;
-  currentLon: any;
+  currentLat: any = 52.03096758574192;
+  currentLon: any = 8.537116459846818;
   currentLocation: string = "Aktuelle Position: Bielefeld Herforderstraße 69 , Deutschland";
-  languageSVG: string = "de"
+  languageSVG: string = "de";
 
   constructor(private iconLibraries: NbIconLibraries) {
     this.iconLibraries.getPack("eva").icons.set(
@@ -30,6 +30,13 @@ export class ChatbotComponent implements OnInit, OnDestroy{
     this.addBotMessage('Human presence detected 🤖. Wie kann ich dir behilflich sein? ');
     this.webSocketAPI = new WebSocketAPI(this);
     this.webSocketAPI._connect();
+    var ws = this.webSocketAPI;
+    var component = this;
+    setTimeout( function(){
+      ws._sendLocation(component.currentLon,component.currentLat);
+      ws._sendLanguageChange(component.languageSVG);
+    }, 800);
+
   }
 
   handleUserMessage(event: any): void {
@@ -100,11 +107,11 @@ export class ChatbotComponent implements OnInit, OnDestroy{
   }
 
   changeLanguage(){
-    this.webSocketAPI._sendLanguageChange();
     if(this.languageSVG == "de"){
       this.languageSVG = "gb";
     } else {
-      this.languageSVG = "de"
+      this.languageSVG = "de";
     }
+    this.webSocketAPI._sendLanguageChange(this.languageSVG);
   }
 }
