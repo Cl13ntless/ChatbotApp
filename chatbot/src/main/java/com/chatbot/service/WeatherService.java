@@ -249,6 +249,7 @@ public class WeatherService {
         }
     }
 
+    //Getting Reverse Geolocation from current lat and lon values
     public String getReverseGeolocation() throws ReverseGeolocationException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme("https")
