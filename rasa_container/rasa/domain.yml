@@ -5,13 +5,9 @@ intents:
   - goodbye
   - bot_challenge
   - weather
-    use_entities: ["time"]
   - city_weather
-    use_entities: ["LOC","time"]
   - other_day
-    use_entities: ["time"]
   - other_city
-    use_entities: ["LOC"]
 
 entities:
   - LOC
