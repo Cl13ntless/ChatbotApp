@@ -49,7 +49,7 @@ export class ChatbotComponent implements OnInit, OnDestroy{
   addUserMessage(text: string): void {
     this.messages.push({
       text,
-      sender: 'Julius Figge',
+      sender: 'Julius Figge ',
       avatar: '/assets/bot.jpeg',
       reply: true,
       date: new Date()
