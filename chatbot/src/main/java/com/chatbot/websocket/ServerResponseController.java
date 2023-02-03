@@ -40,7 +40,7 @@ public class ServerResponseController {
 
         try {
             mapToSlots(mappedResponse);
-        } catch (GeolocationException | ReverseGeolocationException e) {
+        } catch (GeolocationException | ReverseGeolocationException | IndexOutOfBoundsException e) {
             return createErrorResponse();
         }
 
@@ -82,7 +82,7 @@ public class ServerResponseController {
                     return new ServerResponse(translateMessageIfNeeded(rasaService.getChatResponse(HtmlUtils.htmlEscape(prompt.getText()))));
 
             }
-        } catch ( WeatherAPIException | NullPointerException e) {
+        } catch ( WeatherAPIException | NullPointerException | IndexOutOfBoundsException e) {
             e.printStackTrace();
             return createErrorResponse();
         }

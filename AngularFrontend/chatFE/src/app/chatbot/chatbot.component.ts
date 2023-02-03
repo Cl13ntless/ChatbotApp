@@ -63,7 +63,7 @@ export class ChatbotComponent implements OnInit, OnDestroy{
       avatar: '/assets/bot.jpeg',
       date: new Date()
     });
-    window.scroll(0,document.body.scrollHeight);
+    window.scroll(0,document.documentElement.scrollHeight);
   }
 
   addWeatherImage(toDisplay?: any): void{
@@ -74,13 +74,15 @@ export class ChatbotComponent implements OnInit, OnDestroy{
       type: 'file',
       files: files,
     });
-    window.scroll(0,document.body.scrollHeight);
+    setTimeout( function(){
+      window.scroll(0,document.documentElement.scrollHeight);
+    }, 50);
+
   }
 
   handleMessage(message:any): void{
     this.addBotMessage(message);
-      this.loading = false;
-
+    this.loading = false;
   }
 
   ngOnDestroy(): void {
