@@ -9,27 +9,40 @@ import com.chatbot.service.TranslationService;
 import com.chatbot.service.WeatherService;
 import com.chatbot.websocket.responseMapperIntent.Intent;
 import com.chatbot.websocket.responseMapperIntent.ResponseIntent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
 
 @Controller
 public class ServerResponseController {
+    private static final Logger logger = LoggerFactory.getLogger(ServerResponseController.class);
+    private static final String WEATHER_INTENT = "weather";
+    private static final String CITY_WEATHER_INTENT = "city_weather";
+    private static final String OTHER_DAY_INTENT = "other_day";
+    private static final String OTHER_CITY_INTENT = "other_city";
+    private static final double CONFIDENCE_THRESHOLD = 0.9;
+    private static final String ERROR_MESSAGE = "Entschuldigung ich konnte dich nicht wirklich verstehen.Versuche es nochmal und Achte auf deine Rechtschreibung!";
+
+    String responseTemplate = "Die aktuell vorausgesagte Temperatur für %s,%s am %s um %s Uhr beträgt %s Grad Celcius";
+    String responseTemplateEN = "Die aktuell vorausgesagte Temperatur für %s,%s am %s um %s Uhr - beträgt %s Grad Celcius";
+    String locationTemplate = "Aktuelle Position: %s %s %s , %s ";
     TranslationService translationService = new TranslationService();
     RasaService rasaService = new RasaService();
     WeatherService weatherService = new WeatherService();
-    String[] intentNames = {"weather", "city_weather", "other_day", "other_city"};
+    String[] intentNames = {WEATHER_INTENT, CITY_WEATHER_INTENT, OTHER_DAY_INTENT, OTHER_CITY_INTENT};
     String city;
     String countryCode;
     String requestedDay;
     String hour;
     String temperature;
-    Double CONFIDENCE_THRESHOLD = 0.9;
     String currentLang = "de";
     Intent lastIntent;
 
@@ -45,56 +58,49 @@ public class ServerResponseController {
         }
 
         city = StringUtils.capitalize(weatherService.getCity()
-                .replaceAll("&uuml;", "ü")
-                .replaceAll("&Auml;", "ä")
-                .replaceAll("&ouml;", "ö"));
-        countryCode = weatherService.getCountryCode().toUpperCase();
-        requestedDay = weatherService.getDay();
-        hour = weatherService.getHour();
-
+                .replace("&uuml;", "ü")
+                .replace("&Auml;", "ä")
+                .replace("&ouml;", "ö"));
         try {
+            countryCode = weatherService.getCountryCode().toUpperCase();
+            requestedDay = weatherService.getDay();
+            hour = weatherService.getHour();
 
             switch (mappedResponse.getIntent().getName()) {
-                case "weather":
-                    temperature = String.valueOf(weatherService.cityWeatherApiCall(true).getTemperature());
-                    break;
-
-                case "city_weather":
-                    temperature = String.valueOf(weatherService.cityWeatherApiCall(false).getTemperature());
-                    break;
-
-                case "other_day", "other_city":
-                    if (Objects.equals(lastIntent.getName(), "weather")) {
+                case WEATHER_INTENT ->
+                        temperature = String.valueOf(weatherService.cityWeatherApiCall(true).getTemperature());
+                case CITY_WEATHER_INTENT ->
+                        temperature = String.valueOf(weatherService.cityWeatherApiCall(false).getTemperature());
+                case OTHER_DAY_INTENT, OTHER_CITY_INTENT -> {
+                    if (Objects.equals(lastIntent.getName(), WEATHER_INTENT)) {
                         temperature = String.valueOf(weatherService.cityWeatherApiCall(true).getTemperature());
                         break;
-                    } else if (Objects.equals(lastIntent.getName(), "city_weather")) {
+                    } else if (Objects.equals(lastIntent.getName(), CITY_WEATHER_INTENT)) {
                         temperature = String.valueOf(weatherService.cityWeatherApiCall(false).getTemperature());
                         break;
                     }
                     return createErrorResponse();
-
-                default:
-                    if ( mappedResponse.getEntities().length != 0 || mappedResponse.getIntent().getConfidence() < CONFIDENCE_THRESHOLD ) {
+                }
+                default -> {
+                    if (mappedResponse.getEntities().length != 0 || mappedResponse.getIntent().getConfidence() < CONFIDENCE_THRESHOLD) {
                         return createErrorResponse();
                     }
                     //Request zurück an Rasa für die standard Chatbot Antwort und den Intent der der Nachricht für die nächste Nachricht setzen
                     lastIntent = mappedResponse.getIntent();
                     return new ServerResponse(translateMessageIfNeeded(rasaService.getChatResponse(HtmlUtils.htmlEscape(prompt.getText()))));
-
+                }
             }
-        } catch ( WeatherAPIException | NullPointerException | IndexOutOfBoundsException e) {
+        } catch (DateTimeParseException | WeatherAPIException | NullPointerException | IndexOutOfBoundsException e) {
             e.printStackTrace();
             return createErrorResponse();
         }
 
-        //Intent für die nächste nachricht setzen
+        //Intent für die nächste Nachricht setzen
         lastIntent = mappedResponse.getIntent();
-        String response = "Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode + " am "
-                + requestedDay + " um " + hour + " Uhr beträgt " + temperature + " Grad Celcius";
+        String response = String.format(responseTemplate, city, countryCode, requestedDay, hour, temperature);
 
-        if(Objects.equals(currentLang, "gb")){
-            String responseEn = "Die aktuell vorausgesagte Temperatur für " + city + "," + countryCode + " am "
-                    + requestedDay + " um " + hour + " Uhr - beträgt " + temperature + " Grad Celcius";
+        if (Objects.equals(currentLang, "gb")) {
+            String responseEn = String.format(responseTemplateEN, city, countryCode, requestedDay, hour, temperature);
             response = translationService.translateLongMessage(responseEn);
         }
         return new ServerResponse(response);
@@ -102,7 +108,7 @@ public class ServerResponseController {
 
     @MessageMapping("/lat")
     public void getLat(String lat) {
-        System.out.println(lat);
+        logger.info("Lat received from FE: {}", lat);
         weatherService.setCurrentLat(lat);
         try {
             weatherService.getReverseGeolocation();
@@ -115,15 +121,15 @@ public class ServerResponseController {
     @MessageMapping("/lon")
     @SendTo("/topic/currentLoc")
     public ServerResponse getLon(String lon) {
-        System.out.println(lon);
+        logger.info("Lon received from FE: {}", lon);
         weatherService.setCurrentLon(lon);
         try {
             weatherService.getReverseGeolocation();
         } catch (ReverseGeolocationException e) {
             e.printStackTrace();
         }
-        return new ServerResponse(translateMessageIfNeeded("Aktuelle Position: " + weatherService.getCity() )+ " " + weatherService.getStreet()
-                + " " + weatherService.getHousenumber() + " , " + translateMessageIfNeeded(weatherService.getCountry()));
+        String currentLocation = String.format(locationTemplate, weatherService.getCity(), weatherService.getStreet(), weatherService.getHouseNumber(), weatherService.getCountry());
+        return new ServerResponse(translateMessageIfNeeded(currentLocation));
     }
 
     @MessageMapping("/icon")
@@ -136,53 +142,51 @@ public class ServerResponseController {
     }
 
     @MessageMapping("/lang")
-    public void changeLanguage(String language){
+    public void changeLanguage(String language) {
         currentLang = language;
-        System.out.println(currentLang);
+        logger.info("Language after Language change: {}", currentLang);
     }
 
     public ServerResponse createErrorResponse() {
         weatherService.setWeatherIcon(null);
-        return new ServerResponse(translateMessageIfNeeded("Entschuldigung ich konnte dich nicht wirklich verstehen.Versuche es nochmal und Achte auf deine Rechtschreibung!"));
+        return new ServerResponse(translateMessageIfNeeded(ERROR_MESSAGE));
     }
 
     public void mapToSlots(ResponseIntent response) throws GeolocationException, ReverseGeolocationException {
-        if (Objects.equals(response.getIntent().getName(), "city_weather")) {
-            Geolocation geolocation = weatherService.getGeolocation(response.getEntities()[0].getValue().replaceAll("\\?", ""));
-            System.out.println(weatherService.getLon());
+        if (Objects.equals(response.getIntent().getName(), CITY_WEATHER_INTENT)) {
+            Geolocation geolocation = weatherService.getGeolocation(response.getEntities()[0].getValue().replace("?", ""));
+            logger.info("Mapped lon before: {}", weatherService.getLon());
             weatherService.setLat(String.valueOf(geolocation.getLatitude()));
             weatherService.setLon(String.valueOf(geolocation.getLongitude()));
-            System.out.println(weatherService.getLon());
-            weatherService.setCity(response.getEntities()[0].getValue().replaceAll("\\?", ""));
+            logger.info("Mapped lat after: {}", weatherService.getLon());
+            weatherService.setCity(response.getEntities()[0].getValue().replace("?", ""));
             weatherService.setDay(response.getEntities()[1].getValue());
         }
-        if (Objects.equals(response.getIntent().getName(), "weather")) {
+        if (Objects.equals(response.getIntent().getName(), WEATHER_INTENT)) {
             weatherService.setDay(response.getEntities()[0].getValue());
             weatherService.getReverseGeolocation();
         }
 
-        if (Objects.equals(response.getIntent().getName(), "other_day")) {
+        if (Objects.equals(response.getIntent().getName(), OTHER_DAY_INTENT)) {
             weatherService.setDay(response.getEntities()[0].getValue());
         }
 
-        if (Objects.equals(response.getIntent().getName(), "other_city")) {
-            Geolocation geolocation = weatherService.getGeolocation(response.getEntities()[0].getValue().replaceAll("\\?", ""));
-            System.out.println(weatherService.getLon());
+        if (Objects.equals(response.getIntent().getName(), OTHER_CITY_INTENT)) {
+            Geolocation geolocation = weatherService.getGeolocation(response.getEntities()[0].getValue().replace("\\?", ""));
+            logger.info("Mapped lon before: {}", weatherService.getLon());
             weatherService.setLat(String.valueOf(geolocation.getLatitude()));
             weatherService.setLon(String.valueOf(geolocation.getLongitude()));
-            System.out.println(weatherService.getLon());
-            weatherService.setCity(response.getEntities()[0].getValue().replaceAll("\\?", ""));
+            logger.info("Mapped lon after: {}", weatherService.getLon());
+            weatherService.setCity(response.getEntities()[0].getValue().replace("\\?", ""));
         }
     }
 
-    public String translateMessageIfNeeded(String toTranslate){
-        switch(currentLang){
-            case "de":
-                return toTranslate;
-            case "gb":
-                return translationService.translate(toTranslate);
-        }
-        return toTranslate;
+    public String translateMessageIfNeeded(String toTranslate) {
+        //Mehrere Sprachen mit Switch case möglich
+        return switch (currentLang) {
+            case "gb" -> translationService.translate(toTranslate);
+            default -> toTranslate;
+        };
     }
 }
 

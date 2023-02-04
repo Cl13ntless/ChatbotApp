@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NbIconLibraries, NbThemeService } from '@nebular/theme';
+import { NbIconLibraries } from '@nebular/theme';
 import { WebSocketAPI } from '../WebSocketAPI';
 
 @Component({

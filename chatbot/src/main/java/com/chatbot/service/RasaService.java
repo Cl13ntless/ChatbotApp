@@ -7,6 +7,8 @@ import com.chatbot.websocket.responseMapperChatbot.ResponseChatbot;
 import com.chatbot.websocket.responseMapperIntent.ResponseIntent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -14,68 +16,62 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.sql.SQLOutput;
 import java.util.HashMap;
 
 public class RasaService {
-    String RASA_URL = "http://rasa:5005/model/parse";
-    String RASA_CONVERSATIONS_URL = "http://rasa:5005/webhooks/rest/webhook";
-    String RASA_SLOT_URL = "http://rasa:5005/conversations/test_user/tracker";
-
+    private static final HashMap<String, String> initialClientPrompt = new HashMap<>();
+    private static final HashMap<String, String> initialChatMessage = new HashMap<>();
+    private static final HashMap<String, String> chatMessage = new HashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(RasaService.class);
+    private static final String RASA_URL = "http://rasa:5005/model/parse";
+    private static final String RASA_CONVERSATION_URL = "http://rasa:5005/webhooks/rest/webhook";
+    private static final String RASA_SLOT_URL = "http://rasa:5005/conversations/test_user/tracker";
     ObjectMapper objectMapper = new ObjectMapper();
 
     //Makes the first request to Rasa with user input to retrieve the correct intent
-    public ResponseIntent getInitialParameters(String urlParameters) {
-        var values = new HashMap<String, String>() {{
-            put("text", urlParameters);
-        }};
+    public ResponseIntent getInitialParameters(String clientPrompt) {
+        initialClientPrompt.put("text", clientPrompt);
+        initialChatMessage.put("sender", "test_user");
+        initialChatMessage.put("message", clientPrompt);
 
         //send text to rasa to set the correct latest message
-        var values2 = new HashMap<String, String>() {{
-            put("sender", "test_user");
-            put("message", urlParameters);
-        }};
+        try {
+            String chatRequest = objectMapper.writeValueAsString(initialChatMessage);
+            postRequestRasa(RASA_CONVERSATION_URL, chatRequest);
 
-        try{
-        String chatRequest = objectMapper.writeValueAsString(values2);
-        HttpResponse<String> chatResponse = postRequestRasa(RASA_CONVERSATIONS_URL, chatRequest);
+            String requestBody = objectMapper.writeValueAsString(initialClientPrompt);
+            HttpResponse<String> initialResponse = postRequestRasa(RASA_URL, requestBody);
 
-        String requestBody = objectMapper.writeValueAsString(values);
-        HttpResponse<String> initialResponse = postRequestRasa(RASA_URL, requestBody);
+            logger.info("Initial Response with Body: {}", initialResponse.body());
+            return mapResponse(initialResponse.body());
 
-        ResponseIntent mappedResponse = mapResponse(initialResponse.body());
-        System.out.println(initialResponse.body());
-
-        return mappedResponse;
-        } catch(RasaRequestException e){
+        } catch (RasaRequestException e) {
             e.printStackTrace();
-            System.out.println("Rasa couldnt be rached");
-        } catch(JsonProcessingException e){
+            logger.error("Rasa couldnt be rached");
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
-            System.out.println("Object Mapper malfunction");
+            logger.error("Object Mapper malfunction");
         }
         return null;
     }
 
     //Send chat message to rasa chat endpoint and return rasa's response
     public String getChatResponse(String clientMessage) {
-        var values = new HashMap<String, String>() {{
-            put("sender", "test_user");
-            put("message", clientMessage);
-        }};
-        try {
-        String requestBody = objectMapper.writeValueAsString(values);
+        chatMessage.put("sender", "test_user");
+        chatMessage.put("message", clientMessage);
 
-            HttpResponse<String> chatResponse = postRequestRasa(RASA_CONVERSATIONS_URL, requestBody);
+        try {
+            String requestBody = objectMapper.writeValueAsString(chatMessage);
+            HttpResponse<String> chatResponse = postRequestRasa(RASA_CONVERSATION_URL, requestBody);
             ResponseChatbot[] chatResponseArray = objectMapper.readValue(chatResponse.body(), ResponseChatbot[].class);
             return chatResponseArray[0].getText();
 
-        } catch (RasaRequestException e){
+        } catch (RasaRequestException e) {
             e.printStackTrace();
-            System.out.println("Rasa couldnt be rached");
-        } catch (JsonProcessingException e){
+            logger.error("Rasa couldnt be rached");
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
-            System.out.println("Object Mapper malfunction");
+            logger.error("Object Mapper malfunction");
         }
         return null;
     }
@@ -89,58 +85,49 @@ public class RasaService {
                 .POST(HttpRequest.BodyPublishers.ofString(jsonValues))
                 .build();
 
-        try{
-        HttpResponse<String> response = client.send(request,
-                HttpResponse.BodyHandlers.ofString());
-
-        return response;
-        } catch (InterruptedException e){
+        try {
+            return client.send(request,
+                    HttpResponse.BodyHandlers.ofString());
+        } catch (InterruptedException e) {
             e.printStackTrace();
+            Thread.currentThread().interrupt();
             throw new RasaRequestException("Interrupted Connection to Rasa");
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             throw new RasaRequestException("Problem with IO in Rasa Request");
         }
     }
 
     //Map a response Intent Item from its JSON to a POJO
-    public ResponseIntent mapResponse(String responseJson){
-        try{
-        ObjectMapper mapper = new ObjectMapper();
-        ResponseIntent mappedResponse = mapper.readValue(responseJson, ResponseIntent.class);
-        return mappedResponse;
-        } catch (JsonProcessingException e){
+    public ResponseIntent mapResponse(String responseJson) {
+        try {
+            return objectMapper.readValue(responseJson, ResponseIntent.class);
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
-            System.out.println("Mapper malfunction");
+            logger.error("Mapper malfunction");
             return null;
         }
     }
+
     //Get the Latest message received by RASA through the SLOT URL endpoint
-    public Latest_Message getLatestMessage(){
-        try{
-        ObjectMapper objectMapper = new ObjectMapper();
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI(RASA_SLOT_URL))
-                .GET()
-                .build();
-        System.out.println(request);
-        HttpResponse<String> response = client
-                .send(request, HttpResponse.BodyHandlers.ofString());
+    public Latest_Message getLatestMessage() {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(RASA_SLOT_URL))
+                    .GET()
+                    .build();
+            HttpResponse<String> response = client
+                    .send(request, HttpResponse.BodyHandlers.ofString());
 
-
-        ResponseLM responseLatestMessage = objectMapper.readValue(response.body(), ResponseLM.class);
-        System.out.println(responseLatestMessage.getLatest_message().getIntent().getName());
-        return responseLatestMessage.getLatest_message();
-        } catch (IOException e){
+            ResponseLM responseLatestMessage = objectMapper.readValue(response.body(), ResponseLM.class);
+            return responseLatestMessage.getLatest_message();
+        } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
-            System.out.println("Latest message couldn't be acquired");
-        } catch (InterruptedException e){
+            logger.error("Latest message couldn't be acquired");
+        } catch (InterruptedException e) {
             e.printStackTrace();
-            System.out.println("Latest message couldn't be acquired");
-        } catch (URISyntaxException e){
-            e.printStackTrace();
-            System.out.println("Latest message URI couldn't be build");
+            Thread.currentThread().interrupt();
         }
         return null;
     }

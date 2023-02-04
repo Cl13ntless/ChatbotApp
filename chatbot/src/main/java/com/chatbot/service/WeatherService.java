@@ -10,6 +10,8 @@ import com.chatbot.websocket.responseMapperWeather.Weather;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.hc.core5.net.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -19,11 +21,16 @@ import java.net.http.HttpResponse;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 public class WeatherService {
+    private static final Logger logger = LoggerFactory.getLogger(WeatherService.class);
+    private static final String HTTPS = "https";
+    private static final String WEATHER_HOST = "api.brightsky.dev";
+    private static final String WEATHER_PATH = "/weather";
     ObjectMapper mapper = new ObjectMapper();
 
     String currentLat = "52.03096758574192";
@@ -32,13 +39,11 @@ public class WeatherService {
     String lon = "8.537116459846818";
     String city = "Bielefeld";
     String country = "Deutschland";
-    String housenumber = "69";
+    String houseNumber = "69";
     String street = "Herforder Straße";
     String day = "2023-01-27T08:00:00.000+01:00";
     String weatherIcon;
-
     String hour;
-
     String countryCode = "DE";
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd.MM.yyyy").withLocale(Locale.GERMANY);
@@ -75,12 +80,12 @@ public class WeatherService {
         this.country = country;
     }
 
-    public String getHousenumber() {
-        return housenumber;
+    public String getHouseNumber() {
+        return houseNumber;
     }
 
-    public void setHousenumber(String housenumber) {
-        this.housenumber = housenumber;
+    public void setHouseNumber(String houseNumber) {
+        this.houseNumber = houseNumber;
     }
 
     public String getStreet() {
@@ -138,29 +143,29 @@ public class WeatherService {
     }
 
     //Weather API Call mit Längen und Breitengraden
-    public Weather cityWeatherApiCall(boolean currentPos) throws WeatherAPIException {
-        System.out.println("LAT: " + lat);
-        System.out.println("LON: " + lon);
-        System.out.println("DAY: " + day);
+    public Weather cityWeatherApiCall(boolean currentPos) throws WeatherAPIException, DateTimeParseException {
+        logger.info("LAT: {}", lat);
+        logger.info("LON: {}", lon);
+        logger.info("DAY: {}", day);
         OffsetDateTime dateTime = OffsetDateTime.parse(day);
         Date requested = new Date(dateTime.toInstant().toEpochMilli());
-        requested = DateUtils.round(requested,Calendar.HOUR);
+        requested = DateUtils.round(requested, Calendar.HOUR);
         dateTime = requested.toInstant().atOffset(ZoneOffset.ofHours(1));
         String roundedDay = dateTime.toString();
 
         URIBuilder builder = new URIBuilder();
         if (!currentPos) {
-            builder.setScheme("https")
-                    .setHost("api.brightsky.dev")
-                    .setPath("/weather")
+            builder.setScheme(HTTPS)
+                    .setHost(WEATHER_HOST)
+                    .setPath(WEATHER_PATH)
                     .addParameter("lat", lat)
                     .addParameter("lon", lon)
                     .addParameter("date", roundedDay)
                     .addParameter("last_date", roundedDay);
         } else {
-            builder.setScheme("https")
-                    .setHost("api.brightsky.dev")
-                    .setPath("/weather")
+            builder.setScheme(HTTPS)
+                    .setHost(WEATHER_HOST)
+                    .setPath(WEATHER_PATH)
                     .addParameter("lat", currentLat)
                     .addParameter("lon", currentLon)
                     .addParameter("date", roundedDay)
@@ -177,39 +182,40 @@ public class WeatherService {
             HttpResponse<String> response = client
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
-            System.out.println(request);
-            System.out.println(response.body());
+            logger.info("Weather response: {}", response.body());
             ResponseWeather responseWeather = mapper.readValue(response.body(), ResponseWeather.class);
             Weather[] weathers = responseWeather.getWeather();
             weatherIcon = weathers[0].getIcon();
             return weathers[0];
 
         } catch (IOException e) {
-            System.out.println("IO Exception");
+            logger.error("IO Exception in City Weather API call!");
             e.printStackTrace();
-            throw new WeatherAPIException("IO Exception!");
+            throw new WeatherAPIException("");
         } catch (URISyntaxException e) {
-            System.out.println("Malformed Syntax!");
+            logger.error("Malformed Syntax in City Weather API call!");
             e.printStackTrace();
-            throw new WeatherAPIException("Malformed URI!");
+            throw new WeatherAPIException("");
         } catch (InterruptedException e) {
-            System.out.println("Http Connection got Interrupted");
+            logger.error("Connection got Interrupted in City Weather API call!");
+            Thread.currentThread().interrupt();
             e.printStackTrace();
-            throw new WeatherAPIException("Connection got Interrupted");
+            throw new WeatherAPIException("");
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("No Weather Data Returned!");
+            logger.error("No Weather Data Returned!");
             e.printStackTrace();
             throw new WeatherAPIException("No Weather Data");
         }
     }
 
     public Geolocation getGeolocation(String location) throws GeolocationException {
-        location = location.replaceAll("&uuml;", "ue")
-                .replaceAll("&Auml;", "ae")
-                .replaceAll("&ouml;", "oe")
-                .replaceAll(" ", "/");
+        location = location
+                .replace("&uuml;", "ue")
+                .replace("&Auml;", "ae")
+                .replace("&ouml;", "oe")
+                .replace(" ", "/");
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("https")
+        builder.setScheme(HTTPS)
                 .setHost("api.api-ninjas.com")
                 .setPath("/v1/geocoding")
                 .addParameter("city", location);
@@ -228,31 +234,25 @@ public class WeatherService {
             Geolocation[] geolocations = mapper.readValue(response.body(), Geolocation[].class);
             setCountryCode(geolocations[0].getCountry());
 
-            System.out.println(response.body());
+            logger.error(response.body());
             return geolocations[0];
-        } catch (IOException e) {
-            System.out.println("IO Exception");
+
+        } catch (URISyntaxException | ArrayIndexOutOfBoundsException | IOException e) {
+            logger.error("Exception in getGeolocation");
             e.printStackTrace();
-            throw new GeolocationException("IO Exception!");
-        } catch (URISyntaxException e) {
-            System.out.println("Malformed Syntax!");
-            e.printStackTrace();
-            throw new GeolocationException("Malformed URI!");
+            throw new GeolocationException("");
         } catch (InterruptedException e) {
-            System.out.println("Http Connection got Interrupted");
+            logger.error("Http Connection got Interrupted in getGeolocation");
+            Thread.currentThread().interrupt();
             e.printStackTrace();
-            throw new GeolocationException("Connection got Interrupted");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("There was no Geolocation Returned!");
-            e.printStackTrace();
-            throw new GeolocationException("No Geolocation Returned!");
+            throw new GeolocationException("");
         }
     }
 
     //Getting Reverse Geolocation from current lat and lon values test
-    public String getReverseGeolocation() throws ReverseGeolocationException {
+    public void getReverseGeolocation() throws ReverseGeolocationException {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("https")
+        builder.setScheme(HTTPS)
                 .setHost("api.geoapify.com")
                 .setPath("/v1/geocode/reverse")
                 .addParameter("lat", currentLat)
@@ -270,32 +270,25 @@ public class WeatherService {
             HttpResponse<String> response = client
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
-            System.out.println(response.body());
+            logger.info("Reverse Geolocation Body: {}", response.body());
 
             ReverseGeolocation reverseGeolocations = mapper.readValue(response.body(), ReverseGeolocation.class);
             setCountryCode(reverseGeolocations.getFeatures()[0].getProperties().getCountry_code());
             city = reverseGeolocations.getFeatures()[0].getProperties().getCity();
             street = reverseGeolocations.getFeatures()[0].getProperties().getStreet();
-            housenumber = reverseGeolocations.getFeatures()[0].getProperties().getHousenumber();
+            houseNumber = reverseGeolocations.getFeatures()[0].getProperties().getHousenumber();
             country = reverseGeolocations.getFeatures()[0].getProperties().getCountry();
-            System.out.println("Reverse Geolocation von: " + city);
-            return city;
-        } catch (IOException e) {
-            System.out.println("IO Exception");
+            logger.info("Reverse Geolocation von: {}", city);
+
+        } catch (URISyntaxException | NullPointerException | IOException e) {
+            logger.error("Exception in Reverse Geolocation");
             e.printStackTrace();
             throw new ReverseGeolocationException("IO Exception!");
-        } catch (URISyntaxException e) {
-            System.out.println("Malformed Syntax!");
-            e.printStackTrace();
-            throw new ReverseGeolocationException("Malformed URI!");
         } catch (InterruptedException e) {
-            System.out.println("Http Connection got Interrupted");
+            logger.error("Http Connection got Interrupted");
             e.printStackTrace();
+            Thread.currentThread().interrupt();
             throw new ReverseGeolocationException("Connection got Interrupted");
-        } catch (NullPointerException e) {
-            System.out.println("Lat and Lon Values couldnt be read");
-            e.printStackTrace();
-            throw new ReverseGeolocationException("Lat and Lon Values couldnt be read");
         }
     }
 }
