@@ -30,8 +30,8 @@ export class ChatbotComponent implements OnInit, OnDestroy{
     this.addBotMessage('Human presence detected 🤖. Wie kann ich dir behilflich sein? ');
     this.webSocketAPI = new WebSocketAPI(this);
     this.webSocketAPI._connect();
-    var ws = this.webSocketAPI;
-    var component = this;
+    let ws = this.webSocketAPI;
+    let component = this;
     setTimeout( function(){
       ws._sendLanguageChange(component.languageSVG);
     }, 800);
@@ -68,7 +68,7 @@ export class ChatbotComponent implements OnInit, OnDestroy{
 
   addWeatherImage(toDisplay?: any): void{
 
-    var files = [ { url: `/assets/${toDisplay}.png`, type: 'image/png' } ];
+    let files = [ { url: `/assets/${toDisplay}.png`, type: 'image/png' } ];
     this.messages.push({
       avatar: '/assets/bot.jpeg',
       type: 'file',

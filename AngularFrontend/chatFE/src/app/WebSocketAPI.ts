@@ -1,6 +1,5 @@
 import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
-import { AppComponent } from './app.component';
 import { ChatbotComponent } from './chatbot/chatbot.component';
 
 export class WebSocketAPI {
@@ -26,7 +25,6 @@ export class WebSocketAPI {
             _this.stompClient.subscribe("/topic/icon", function (sdkEvent: any) {
                 _this.onIconReceived(sdkEvent);
             });
-            //_this.stompClient.reconnect_delay = 2000;
         }, this.errorCallBack);
     };
 

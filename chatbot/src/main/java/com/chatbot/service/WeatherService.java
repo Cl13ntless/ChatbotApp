@@ -208,6 +208,7 @@ public class WeatherService {
         }
     }
 
+//    Geolocation API Call → Stadtname wird an API geschickt um Lat und Lon zu bekommen
     public Geolocation getGeolocation(String location) throws GeolocationException {
         location = location
                 .replace("&uuml;", "ue")
@@ -249,7 +250,7 @@ public class WeatherService {
         }
     }
 
-    //Getting Reverse Geolocation from current lat and lon values test
+//    Getting Reverse Geolocation from current lat and lon values
     public void getReverseGeolocation() throws ReverseGeolocationException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(HTTPS)

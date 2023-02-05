@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Feature {
     Property properties;
 
-    public Feature(){}
+    public Feature(){ /* Needs to be empty for mapping */ }
 
     public Property getProperties() {
         return properties;

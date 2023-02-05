@@ -31,8 +31,8 @@ public class ServerResponseController {
     private static final double CONFIDENCE_THRESHOLD = 0.9;
     private static final String ERROR_MESSAGE = "Entschuldigung ich konnte dich nicht wirklich verstehen.Versuche es nochmal und Achte auf deine Rechtschreibung!";
 
-    String responseTemplate = "Die aktuell vorausgesagte Temperatur für %s,%s am %s um %s Uhr beträgt %s Grad Celcius";
-    String responseTemplateEN = "Die aktuell vorausgesagte Temperatur für %s,%s am %s um %s Uhr - beträgt %s Grad Celcius";
+    String responseTemplate = "Die aktuell vorausgesagte Temperatur für %s,%s am %s um %s Uhr beträgt %s Grad Celsius";
+    String responseTemplateEN = "Die aktuell vorausgesagte Temperatur für %s,%s am %s um %s Uhr - beträgt %s Grad Celsius";
     String locationTemplate = "Aktuelle Position: %s %s %s , %s ";
     TranslationService translationService = new TranslationService();
     RasaService rasaService = new RasaService();
@@ -85,7 +85,7 @@ public class ServerResponseController {
                     if (mappedResponse.getEntities().length != 0 || mappedResponse.getIntent().getConfidence() < CONFIDENCE_THRESHOLD) {
                         return createErrorResponse();
                     }
-                    //Request zurück an Rasa für die standard Chatbot Antwort und den Intent der der Nachricht für die nächste Nachricht setzen
+                    //Request zurück an Rasa für die standard Chatbot Antwort und den Intent der Nachricht für die nächste Nachricht setzen
                     lastIntent = mappedResponse.getIntent();
                     return new ServerResponse(translateMessageIfNeeded(rasaService.getChatResponse(HtmlUtils.htmlEscape(prompt.getText()))));
                 }
@@ -99,6 +99,8 @@ public class ServerResponseController {
         lastIntent = mappedResponse.getIntent();
         String response = String.format(responseTemplate, city, countryCode, requestedDay, hour, temperature);
 
+        /*Es muss geprüft werden, ob die Sprache aktuell auf Englisch gestellt,
+        * wenn das der Fall ist, wird mithilfe des TranslationService übersetzt*/
         if (Objects.equals(currentLang, "gb")) {
             String responseEn = String.format(responseTemplateEN, city, countryCode, requestedDay, hour, temperature);
             response = translationService.translateLongMessage(responseEn);
@@ -106,6 +108,7 @@ public class ServerResponseController {
         return new ServerResponse(response);
     }
 
+//    Lat Endpoint -> Weather Service Slot
     @MessageMapping("/lat")
     public void getLat(String lat) {
         logger.info("Lat received from FE: {}", lat);
@@ -118,6 +121,7 @@ public class ServerResponseController {
 
     }
 
+//    Lon Endpoint -> Weather Service Slot
     @MessageMapping("/lon")
     @SendTo("/topic/currentLoc")
     public ServerResponse getLon(String lon) {
@@ -132,6 +136,7 @@ public class ServerResponseController {
         return new ServerResponse(translateMessageIfNeeded(currentLocation));
     }
 
+//    Das Frontend fragt hier bei jeder gestellten Nachricht an, ob es ein Wettericon gibt
     @MessageMapping("/icon")
     @SendTo("/topic/icon")
     public ServerResponse sendIcon() {
@@ -141,17 +146,20 @@ public class ServerResponseController {
         return null;
     }
 
+//    app/topic language change endpoint
     @MessageMapping("/lang")
     public void changeLanguage(String language) {
         currentLang = language;
         logger.info("Language after Language change: {}", currentLang);
     }
 
+//    Herstellen einer generischen Error Message - Prinzipiell auch genau Error Message möglich
     public ServerResponse createErrorResponse() {
         weatherService.setWeatherIcon(null);
         return new ServerResponse(translateMessageIfNeeded(ERROR_MESSAGE));
     }
 
+//    Unsere Antwort von Rasa wird auf die im Weather Service definierten Slots geschrieben
     public void mapToSlots(ResponseIntent response) throws GeolocationException, ReverseGeolocationException {
         if (Objects.equals(response.getIntent().getName(), CITY_WEATHER_INTENT)) {
             Geolocation geolocation = weatherService.getGeolocation(response.getEntities()[0].getValue().replace("?", ""));
@@ -182,7 +190,7 @@ public class ServerResponseController {
     }
 
     public String translateMessageIfNeeded(String toTranslate) {
-        //Mehrere Sprachen mit Switch case möglich
+        //Mehrere Sprachen mit Switch case möglich, aber prinzipiell ersetzbar durch if Statement.
         return switch (currentLang) {
             case "gb" -> translationService.translate(toTranslate);
             default -> toTranslate;
