@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Latest_Message {
-    Intent intent;
+    public Latest_Message(){ /* Is empty because of Mapper */ }
+    private Intent intent;
 
     public Intent getIntent() {
         return intent;

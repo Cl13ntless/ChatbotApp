@@ -1,11 +1,10 @@
 package com.chatbot.websocket.responseMapperIntent;
 
 public class Intent {
-    String name;
-    double confidence;
+    private String name;
+    private double confidence;
 
-    public Intent() {
-    }
+    public Intent() {/* Is empty because of Mapper */}
 
     public String getName() {
         return name;

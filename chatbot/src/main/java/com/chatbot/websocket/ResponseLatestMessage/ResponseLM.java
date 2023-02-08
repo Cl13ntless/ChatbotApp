@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ResponseLM {
-    public ResponseLM(){}
-
-    String sender_id;
-    Latest_Message latest_message;
+    private String sender_id;
+    private Latest_Message latest_message;
+    public ResponseLM(){/* Is empty because of Mapper */}
 
     public String getSender_id() {
         return sender_id;

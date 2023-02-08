@@ -1,7 +1,7 @@
 package com.chatbot.websocket;
 
 public class ServerResponse {
-    public String content;
+    private String content;
 
     public ServerResponse() {
     }

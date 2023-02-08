@@ -4,13 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Geolocation {
-    String name;
-    double latitude;
-    double longitude;
-    String country;
+    private String name;
+    private double latitude;
+    private double longitude;
+    private String country;
 
-    public Geolocation() {
-    }
+    public Geolocation() {/* Is empty because of Mapper */}
 
     public double getLatitude() {
         return latitude;

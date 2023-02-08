@@ -4,11 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ReverseGeolocation {
-
-    public ReverseGeolocation(){}
-
-    Feature[] features;
-
+    private Feature[] features;
+    public ReverseGeolocation(){/* Is empty because of Mapper */}
     public Feature[] getFeatures() {
         return features;
     }

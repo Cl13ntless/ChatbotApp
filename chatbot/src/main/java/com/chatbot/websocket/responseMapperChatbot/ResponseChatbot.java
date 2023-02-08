@@ -5,10 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ResponseChatbot {
 
-    String text;
+    private String text;
 
-    public ResponseChatbot() {
-    }
+    public ResponseChatbot() {/* Is empty because of Mapper */}
 
     public String getText() {
         return text;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Feature {
-    Property properties;
+    private Property properties;
 
     public Feature(){ /* Needs to be empty for mapping */ }
 

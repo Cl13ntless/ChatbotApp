@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Property {
-    String city;
-    String street;
-    String housenumber;
-    String country;
+    private String city;
+    private String street;
+    private String housenumber;
+    private String country;
+    private String country_code;
 
-    String country_code;
-
-    public Property(){}
+    public Property(){/* Is empty because of Mapper */}
 
     public String getCity() {
         return city;

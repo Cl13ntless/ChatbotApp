@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Entity {
-    String entity;
-    String value;
+    private String entity;
+    private String value;
 
     public String getEntity() {
         return entity;

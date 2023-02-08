@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ResponseWeather {
-    Weather[] weather;
+    private Weather[] weather;
 
-    public ResponseWeather() {
-    }
+    public ResponseWeather() { /* Is empty because of Mapper */}
 
     public Weather[] getWeather() {
         return weather;

@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ResponseIntent {
-    String text;
-    Intent intent;
-    Entity[] entities;
+    private String text;
+    private Intent intent;
+    private Entity[] entities;
 
-    public ResponseIntent() {
-    }
+    public ResponseIntent() {/* Is empty because of Mapper */}
 
     public Entity[] getEntities() {
         return entities;
