@@ -30,14 +30,14 @@ public class ServerResponseController {
     private static final String OTHER_CITY_INTENT = "other_city";
     private static final double CONFIDENCE_THRESHOLD = 0.9;
     private static final String ERROR_MESSAGE = "Entschuldigung ich konnte dich nicht wirklich verstehen.Versuche es nochmal und Achte auf deine Rechtschreibung!";
+    private static final String RESPONSE_TEMPLATE = "Die aktuell vorausgesagte Temperatur für %s,%s am %s um %s Uhr beträgt %s Grad Celsius";
+    private static final String RESPONSE_TEMPLATE_EN = "Die aktuell vorausgesagte Temperatur für %s,%s am %s um %s Uhr - beträgt %s Grad Celsius";
+    private static final String LOCATION_TEMPLATE = "Aktuelle Position: %s %s %s , %s ";
+    private static final TranslationService translationService = new TranslationService();
+    private static final RasaService rasaService = new RasaService();
+    private static final WeatherService weatherService = new WeatherService();
+    private static final String[] intentNames = {WEATHER_INTENT, CITY_WEATHER_INTENT, OTHER_DAY_INTENT, OTHER_CITY_INTENT};
 
-    String responseTemplate = "Die aktuell vorausgesagte Temperatur für %s,%s am %s um %s Uhr beträgt %s Grad Celsius";
-    String responseTemplateEN = "Die aktuell vorausgesagte Temperatur für %s,%s am %s um %s Uhr - beträgt %s Grad Celsius";
-    String locationTemplate = "Aktuelle Position: %s %s %s , %s ";
-    TranslationService translationService = new TranslationService();
-    RasaService rasaService = new RasaService();
-    WeatherService weatherService = new WeatherService();
-    String[] intentNames = {WEATHER_INTENT, CITY_WEATHER_INTENT, OTHER_DAY_INTENT, OTHER_CITY_INTENT};
     String city;
     String countryCode;
     String requestedDay;
@@ -97,12 +97,12 @@ public class ServerResponseController {
 
         //Intent für die nächste Nachricht setzen
         lastIntent = mappedResponse.getIntent();
-        String response = String.format(responseTemplate, city, countryCode, requestedDay, hour, temperature);
+        String response = String.format(RESPONSE_TEMPLATE, city, countryCode, requestedDay, hour, temperature);
 
         /*Es muss geprüft werden, ob die Sprache aktuell auf Englisch gestellt,
         * wenn das der Fall ist, wird mithilfe des TranslationService übersetzt*/
         if (Objects.equals(currentLang, "gb")) {
-            String responseEn = String.format(responseTemplateEN, city, countryCode, requestedDay, hour, temperature);
+            String responseEn = String.format(RESPONSE_TEMPLATE_EN, city, countryCode, requestedDay, hour, temperature);
             response = translationService.translateLongMessage(responseEn);
         }
         return new ServerResponse(response);
@@ -132,7 +132,7 @@ public class ServerResponseController {
         } catch (ReverseGeolocationException e) {
             e.printStackTrace();
         }
-        String currentLocation = String.format(locationTemplate, weatherService.getCity(), weatherService.getStreet(), weatherService.getHouseNumber(), weatherService.getCountry());
+        String currentLocation = String.format(LOCATION_TEMPLATE, weatherService.getCity(), weatherService.getStreet(), weatherService.getHouseNumber(), weatherService.getCountry());
         return new ServerResponse(translateMessageIfNeeded(currentLocation));
     }
 
