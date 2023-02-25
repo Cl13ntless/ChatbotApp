@@ -4,7 +4,7 @@ import { ChatbotComponent } from './chatbot/chatbot.component';
 
 export class WebSocketAPI {
     webSocketEndPoint: string = 'http://localhost:8080/gs-guide-websocket';
-    topic: string = "/topic/weather";
+    topic: string = "/user/topic/weather";
     stompClient: any;
     chatComponent: ChatbotComponent;
     constructor(chatbotComponent: ChatbotComponent){
@@ -19,10 +19,10 @@ export class WebSocketAPI {
             _this.stompClient.subscribe(_this.topic, function (sdkEvent: any) {
                 _this.onMessageReceived(sdkEvent);
             });
-            _this.stompClient.subscribe("/topic/currentLoc", function (sdkEvent: any) {
+            _this.stompClient.subscribe("/user/topic/currentLoc", function (sdkEvent: any) {
                 _this.onLocationReceived(sdkEvent);
             });
-            _this.stompClient.subscribe("/topic/icon", function (sdkEvent: any) {
+            _this.stompClient.subscribe("/user/topic/icon", function (sdkEvent: any) {
                 _this.onIconReceived(sdkEvent);
             });
         }, this.errorCallBack);

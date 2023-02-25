@@ -23,9 +23,9 @@ public class RasaService {
     private static final HashMap<String, String> initialChatMessage = new HashMap<>();
     private static final HashMap<String, String> chatMessage = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(RasaService.class);
-    private static final String RASA_URL = "http://rasa:5005/model/parse";
-    private static final String RASA_CONVERSATION_URL = "http://rasa:5005/webhooks/rest/webhook";
-    private static final String RASA_SLOT_URL = "http://rasa:5005/conversations/test_user/tracker";
+    private static final String RASA_URL = "http://localhost:5005/model/parse";
+    private static final String RASA_CONVERSATION_URL = "http://localhost:5005/webhooks/rest/webhook";
+    private static final String RASA_SLOT_URL = "http://localhost:5005/conversations/test_user/tracker";
     ObjectMapper objectMapper = new ObjectMapper();
 
     //Makes the first request to Rasa with user input to retrieve the correct intent

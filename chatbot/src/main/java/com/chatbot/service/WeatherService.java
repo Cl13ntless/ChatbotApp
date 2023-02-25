@@ -235,7 +235,7 @@ public class WeatherService {
             Geolocation[] geolocations = mapper.readValue(response.body(), Geolocation[].class);
             setCountryCode(geolocations[0].getCountry());
 
-            logger.error(response.body());
+            logger.info(response.body());
             return geolocations[0];
 
         } catch (URISyntaxException | ArrayIndexOutOfBoundsException | IOException e) {

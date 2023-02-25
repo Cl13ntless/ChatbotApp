@@ -12,7 +12,7 @@ import com.chatbot.websocket.responseMapperIntent.ResponseIntent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
@@ -47,10 +47,9 @@ public class ServerResponseController {
     Intent lastIntent;
 
     @MessageMapping("/inquiry")
-    @SendTo("/topic/weather")
+    @SendToUser("/topic/weather")
     public ServerResponse serverResponse(ClientPrompt prompt) {
         ResponseIntent mappedResponse = rasaService.getInitialParameters(HtmlUtils.htmlEscape(prompt.getText()));
-
         try {
             mapToSlots(mappedResponse);
         } catch (GeolocationException | ReverseGeolocationException | IndexOutOfBoundsException e) {
@@ -123,7 +122,7 @@ public class ServerResponseController {
 
 //    Lon Endpoint -> Weather Service Slot
     @MessageMapping("/lon")
-    @SendTo("/topic/currentLoc")
+    @SendToUser("/topic/currentLoc")
     public ServerResponse getLon(String lon) {
         logger.info("Lon received from FE: {}", lon);
         weatherService.setCurrentLon(lon);
@@ -138,7 +137,7 @@ public class ServerResponseController {
 
 //    Das Frontend fragt hier bei jeder gestellten Nachricht an, ob es ein Wettericon gibt
     @MessageMapping("/icon")
-    @SendTo("/topic/icon")
+    @SendToUser("/topic/icon")
     public ServerResponse sendIcon() {
         if (List.of(intentNames).contains(rasaService.getLatestMessage().getIntent().getName())) {
             return new ServerResponse(weatherService.getWeatherIcon());
