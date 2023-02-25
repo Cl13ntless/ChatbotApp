@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.Assert;
 
-public class WeatherServiceTest {
+class WeatherServiceTest {
 
     private WeatherService weatherService;
 
@@ -20,13 +20,13 @@ public class WeatherServiceTest {
 
 
     @Test
-    public void cityWeatherApiCallTest() throws WeatherAPIException {
+    void cityWeatherApiCallTest() throws WeatherAPIException {
         Assert.notNull(weatherService.cityWeatherApiCall(true),"Current Position should not be null");
         Assert.notNull(weatherService.cityWeatherApiCall(false),"Current Position should not be null");
     }
 
     @Test
-    public void getGeolocationTest()throws GeolocationException {
+    void getGeolocationTest()throws GeolocationException {
         String location = "Lagos";
         String expectedLat = "6.45306";
         String expectedLon = "3.39583";
@@ -40,7 +40,7 @@ public class WeatherServiceTest {
     }
 
     @Test
-    public void falseGeolocationtest() throws GeolocationException{
+    void falseGeolocationtest() throws GeolocationException{
         String nonLocation = "haerlas";
 
         Assertions.assertThrows(GeolocationException.class, () -> {
@@ -50,7 +50,7 @@ public class WeatherServiceTest {
     }
 
     @Test
-    public void getReverseGeolocationTest() throws ReverseGeolocationException {
+    void getReverseGeolocationTest() throws ReverseGeolocationException {
         weatherService.setCurrentLat("52.03096758574192");
         weatherService.setCurrentLon("8.537116459846818");
         weatherService.getReverseGeolocation();
@@ -59,7 +59,7 @@ public class WeatherServiceTest {
     }
 
     @Test
-    public void getReverseGeolocationException(){
+    void getReverseGeolocationException(){
         weatherService.setCurrentLon("123412");
         weatherService.setCurrentLat("124562");
 
