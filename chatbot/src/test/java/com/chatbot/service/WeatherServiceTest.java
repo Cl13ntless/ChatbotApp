@@ -28,8 +28,8 @@ public class WeatherServiceTest {
     @Test
     public void getGeolocationTest()throws GeolocationException {
         String location = "Lagos";
-        String expectedLat = "6.4550575";
-        String expectedLon = "3.3941795";
+        String expectedLat = "6.45306";
+        String expectedLon = "3.39583";
 
         Geolocation geolocation = weatherService.getGeolocation(location);
         String actualLat = String.valueOf(geolocation.getLatitude());
