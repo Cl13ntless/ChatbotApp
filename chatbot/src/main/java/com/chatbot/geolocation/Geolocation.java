@@ -7,7 +7,7 @@ public class Geolocation {
     private String name;
     private double latitude;
     private double longitude;
-    private String country;
+    private String country_code;
 
     public Geolocation() {/* Is empty because of Mapper */}
 
@@ -23,7 +23,7 @@ public class Geolocation {
         return name;
     }
 
-    public String getCountry() {
-        return country;
+    public String getCountry_code() {
+        return country_code;
     }
 }

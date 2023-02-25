@@ -3,6 +3,7 @@ package com.chatbot.service;
 import com.chatbot.exception.GeolocationException;
 import com.chatbot.exception.ReverseGeolocationException;
 import com.chatbot.exception.WeatherAPIException;
+import com.chatbot.geolocation.GeoData;
 import com.chatbot.geolocation.Geolocation;
 import com.chatbot.geolocation.ReverseGeolocation;
 import com.chatbot.websocket.responseMapperWeather.ResponseWeather;
@@ -29,6 +30,7 @@ import java.util.Locale;
 public class WeatherService {
     private static final Logger logger = LoggerFactory.getLogger(WeatherService.class);
     private static final String HTTPS = "https";
+    private static final String HTTP = "http";
     private static final String WEATHER_HOST = "api.brightsky.dev";
     private static final String WEATHER_PATH = "/weather";
     ObjectMapper mapper = new ObjectMapper();
@@ -216,27 +218,27 @@ public class WeatherService {
                 .replace("&ouml;", "oe")
                 .replace(" ", "/");
         URIBuilder builder = new URIBuilder();
-        builder.setScheme(HTTPS)
-                .setHost("api.api-ninjas.com")
-                .setPath("/v1/geocoding")
-                .addParameter("city", location);
+        builder.setScheme(HTTP)
+                .setHost("api.positionstack.com")
+                .setPath("/v1/forward")
+                .addParameter("access_key", "e867481ed536585740b36e4a26e22444")
+                .addParameter("query", location);
 
         try {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(builder.build().toURL().toURI())
-                    .setHeader("X-Api-Key", "FDWhrAttUr5pWXScGAim0A==9pba7IQ8WtriLrRi")
                     .GET()
                     .build();
 
             HttpResponse<String> response = client
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
-            Geolocation[] geolocations = mapper.readValue(response.body(), Geolocation[].class);
-            setCountryCode(geolocations[0].getCountry());
+            GeoData geolocations = mapper.readValue(response.body(), GeoData.class);
+            setCountryCode(geolocations.getData()[0].getCountry_code());
 
             logger.info(response.body());
-            return geolocations[0];
+            return geolocations.getData()[0];
 
         } catch (URISyntaxException | ArrayIndexOutOfBoundsException | IOException e) {
             logger.error("Exception in getGeolocation");

@@ -179,12 +179,12 @@ public class ServerResponseController {
         }
 
         if (Objects.equals(response.getIntent().getName(), OTHER_CITY_INTENT)) {
-            Geolocation geolocation = weatherService.getGeolocation(response.getEntities()[0].getValue().replace("\\?", ""));
+            Geolocation geolocation = weatherService.getGeolocation(response.getEntities()[0].getValue().replace("?", ""));
             logger.info("Mapped lon before: {}", weatherService.getLon());
             weatherService.setLat(String.valueOf(geolocation.getLatitude()));
             weatherService.setLon(String.valueOf(geolocation.getLongitude()));
             logger.info("Mapped lon after: {}", weatherService.getLon());
-            weatherService.setCity(response.getEntities()[0].getValue().replace("\\?", ""));
+            weatherService.setCity(response.getEntities()[0].getValue().replace("?", ""));
         }
     }
 
