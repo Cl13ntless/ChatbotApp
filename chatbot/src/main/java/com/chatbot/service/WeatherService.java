@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+//Geschrieben von: Alexandra Gleber und Percy Covic
 public class WeatherService {
     private static final Logger logger = LoggerFactory.getLogger(WeatherService.class);
     private static final String HTTPS = "https";

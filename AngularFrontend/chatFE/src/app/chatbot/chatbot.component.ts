@@ -7,6 +7,8 @@ import { WebSocketAPI } from '../WebSocketAPI';
   templateUrl: './chatbot.component.html',
   styleUrls: ['./chatbot.component.scss']
 })
+
+// Geschrieben von: Sinem Bozkurt und Percy Covic
 export class ChatbotComponent implements OnInit, OnDestroy{
   //@ts-ignore
   webSocketAPI: WebSocketAPI;

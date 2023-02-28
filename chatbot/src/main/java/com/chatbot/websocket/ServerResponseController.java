@@ -21,6 +21,8 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
 
+
+//Geschrieben von: Alexandra Gleber, Fabian Hirmer und Percy Covic
 @Controller
 public class ServerResponseController {
     private static final Logger logger = LoggerFactory.getLogger(ServerResponseController.class);
@@ -46,6 +48,13 @@ public class ServerResponseController {
     String currentLang = "de";
     Intent lastIntent;
 
+
+//    Geschrieben von: Alexandra Gleber, Fabian Hirmer und Percy Covic.
+//    Die jeweiligen Mapper Klassen wurden von den jeweiligen verantowrtlichen verfasst, also:
+//    Weatherservice Mapper Klassen: Alexandra Gleber + Percy Covic
+//    RasaService Mapper Klassen: Fabian Hirmer + Percy Covic
+//    Exceptions: Percy Covic
+//    Dockerization + Pipeline Erstellung: Percy Covic
     @MessageMapping("/inquiry")
     @SendToUser("/topic/weather")
     public ServerResponse serverResponse(ClientPrompt prompt) {
@@ -106,8 +115,8 @@ public class ServerResponseController {
         }
         return new ServerResponse(response);
     }
-
-//    Lat Endpoint -> Weather Service Slot
+//    Geschrieben von: Sinem Bozkurt und Percy Covic
+//    Lat Endpoint → Weather Service Slot
     @MessageMapping("/lat")
     public void getLat(String lat) {
         logger.info("Lat received from FE: {}", lat);
@@ -119,7 +128,7 @@ public class ServerResponseController {
         }
 
     }
-
+//    Geschrieben von: Sinem Bozkurt und Percy Covic
 //    Lon Endpoint -> Weather Service Slot
     @MessageMapping("/lon")
     @SendToUser("/topic/currentLoc")
@@ -135,6 +144,7 @@ public class ServerResponseController {
         return new ServerResponse(translateMessageIfNeeded(currentLocation));
     }
 
+//    Geschrieben von: Sinem Bozkurt und Percy Covic.
 //    Das Frontend fragt hier bei jeder gestellten Nachricht an, ob es ein Wettericon gibt
     @MessageMapping("/icon")
     @SendToUser("/topic/icon")
@@ -145,6 +155,7 @@ public class ServerResponseController {
         return null;
     }
 
+//    Geschrieben von: Alexandra Gleber und Percy Covic.
 //    app/topic language change endpoint
     @MessageMapping("/lang")
     public void changeLanguage(String language) {
@@ -152,12 +163,14 @@ public class ServerResponseController {
         logger.info("Language after Language change: {}", currentLang);
     }
 
+//    Geschrieben von: Fabian Hirmer und Percy Covic und Alexandra Gleber.
 //    Herstellen einer generischen Error Message - Prinzipiell auch genau Error Message möglich
     public ServerResponse createErrorResponse() {
         weatherService.setWeatherIcon(null);
         return new ServerResponse(translateMessageIfNeeded(ERROR_MESSAGE));
     }
 
+//    Geschrieben von: Alexandra Gleber und Percy Covic.
 //    Unsere Antwort von Rasa wird auf die im Weather Service definierten Slots geschrieben
     public void mapToSlots(ResponseIntent response) throws GeolocationException, ReverseGeolocationException {
         if (Objects.equals(response.getIntent().getName(), CITY_WEATHER_INTENT)) {
@@ -188,6 +201,7 @@ public class ServerResponseController {
         }
     }
 
+//    Geschrieben von: Alexandra Gleber und Percy Covic
     public String translateMessageIfNeeded(String toTranslate) {
         //Mehrere Sprachen mit Switch case möglich, aber prinzipiell ersetzbar durch if Statement.
         return switch (currentLang) {

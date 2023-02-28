@@ -18,6 +18,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
 
+
+//Geschrieben von: Fabian Hirmer und Percy Covic
 public class RasaService {
     private static final HashMap<String, String> initialClientPrompt = new HashMap<>();
     private static final HashMap<String, String> initialChatMessage = new HashMap<>();

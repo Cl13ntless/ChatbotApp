@@ -2,6 +2,8 @@ import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
 import { ChatbotComponent } from './chatbot/chatbot.component';
 
+
+// Geschrieben von Sinem Bozkurt und Percy Covic
 export class WebSocketAPI {
     webSocketEndPoint: string = 'http://localhost:8080/gs-guide-websocket';
     topic: string = "/user/topic/weather";

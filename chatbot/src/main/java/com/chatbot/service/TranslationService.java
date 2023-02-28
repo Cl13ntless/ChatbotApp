@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+//Geschrieben von: Alexandra Gleber und Percy Covic
 public class TranslationService {
     private static final Logger logger = LoggerFactory.getLogger(TranslationService.class);
     private static final String SPACE = " ";
